@@ -1,0 +1,988 @@
+<!doctype html>
+<html lang="zh-Hant" data-doclang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>出差行程規劃工具 — 使用說明書 / User Manual</title>
+<style>
+  :root{
+    --bg:#f4f6f9; --panel:#fff; --border:#d9dee5; --text:#1f2933; --muted:#647084;
+    --accent:#2563eb; --accent2:#0f7a4d; --chip:#eef3fb; --warnbg:#fff8e6; --warnbd:#f0dca6; --warntx:#6b5713;
+    --delbg:#fbecec; --delbd:#e2a9a1; --deltx:#c0392b; --side:#fbfcfe;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; font-family:"Segoe UI","Microsoft JhengHei","PingFang TC",system-ui,sans-serif; background:var(--bg); color:var(--text); line-height:1.8; font-size:15px;}
+  .layout{display:flex; align-items:flex-start; max-width:1240px; margin:0 auto;}
+
+  .sidebar{position:sticky; top:0; align-self:flex-start; flex-shrink:0; width:280px; height:100vh; overflow-y:auto; background:var(--side); border-right:1px solid var(--border); padding:18px 16px 40px;}
+  .langsw{display:flex; gap:6px; margin:0 0 16px;}
+  .langsw button{flex:1; font-family:inherit; font-size:12.5px; font-weight:600; cursor:pointer; padding:7px 4px; border:1px solid var(--border); background:#fff; color:var(--text); border-radius:7px; transition:.12s;}
+  .langsw button:hover{border-color:var(--accent); color:var(--accent);}
+  .langsw button.on{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .sidebar .brand{font-size:15px; font-weight:700; color:var(--accent); margin:0 0 4px; padding:0 8px;}
+  .sidebar .brandsub{font-size:11.5px; color:var(--muted); margin:0 0 14px; padding:0 8px;}
+  .sidebar nav ol{list-style:none; margin:0; padding:0;}
+  .sidebar nav>ol>li{margin:1px 0;}
+  .sidebar a{display:block; text-decoration:none; color:var(--text); font-size:13.5px; padding:6px 10px; border-radius:7px; border-left:3px solid transparent;}
+  .sidebar a:hover{background:var(--chip);}
+  .sidebar a.top{font-weight:600;}
+  .sidebar a.sub{font-size:12.5px; color:var(--muted); padding:4px 10px 4px 22px;}
+  .sidebar a.active{background:var(--chip); color:var(--accent); border-left-color:var(--accent); font-weight:600;}
+  .sidebar .sublist{margin:0 0 4px;}
+
+  .content{flex:1; min-width:0; padding:30px 44px 60px; max-width:900px;}
+  header.top h1{font-size:26px; margin:0 0 6px;}
+  header.top .sub{color:var(--muted); font-size:14px; margin:0;}
+  .note{background:var(--warnbg); border:1px solid var(--warnbd); color:var(--warntx); border-radius:8px; padding:12px 16px; font-size:13.5px; margin:16px 0;}
+  .note.blue{background:var(--chip); border-color:#c7d7f0; color:#1e3a68;}
+  .note.red{background:var(--delbg); border-color:var(--delbd); color:var(--deltx);}
+  section.ch{margin:0 0 12px; padding-top:14px;}
+  h2.chh{font-size:21px; color:var(--accent); margin:34px 0 14px; border-bottom:2px solid var(--border); padding-bottom:8px;}
+  h3{font-size:16.5px; margin:26px 0 8px; padding-top:6px;}
+  p{margin:9px 0;}
+  ul,ol{margin:9px 0; padding-left:24px;}
+  li{margin:6px 0;}
+  b{color:var(--text);}
+  code,.kbd{font-family:Consolas,"Courier New",monospace; font-size:12.5px; background:var(--chip); color:#334155; padding:2px 7px; border-radius:6px;}
+  .kbd{border:1px solid #c7d0dc; box-shadow:0 1px 0 #c7d0dc;}
+  .btn{display:inline-block; font-weight:600; font-size:12.5px; background:var(--accent); color:#fff; padding:2px 10px; border-radius:6px; white-space:nowrap;}
+  .btn.g{background:#64748b;} .btn.d{background:var(--deltx);}
+  table{border-collapse:collapse; width:100%; margin:14px 0; font-size:13.5px;}
+  th,td{border:1px solid var(--border); padding:8px 11px; text-align:left; vertical-align:top;}
+  th{background:var(--chip); white-space:nowrap;}
+  .tip{background:#f3fbf6; border:1px solid #b6e0c8; border-left:4px solid var(--accent2); border-radius:8px; padding:11px 15px; margin:14px 0; font-size:13.5px;}
+  .tip b{color:var(--accent2);}
+  .eg{background:#f7f9fc; border:1px dashed #c3cede; border-radius:8px; padding:11px 15px; margin:14px 0; font-size:13.5px;}
+  .eg .lbl{font-weight:700; color:var(--accent); font-size:12px; letter-spacing:.5px;}
+  .steps{counter-reset:step; list-style:none; padding-left:0;}
+  .steps>li{counter-increment:step; position:relative; padding-left:40px; margin:12px 0;}
+  .steps>li::before{content:counter(step); position:absolute; left:0; top:1px; width:27px; height:27px; border-radius:50%; background:var(--accent); color:#fff; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center;}
+  footer{color:var(--muted); font-size:12.5px; margin-top:44px; border-top:1px solid var(--border); padding-top:16px;}
+
+  /* 語言切換:只顯示目前語言 */
+  [data-doc]{display:none;}
+  html[data-doclang="zh"] [data-doc="zh"],
+  html[data-doclang="ja"] [data-doc="ja"],
+  html[data-doclang="en"] [data-doc="en"]{display:block;}
+
+  @media (max-width:860px){
+    .layout{display:block;}
+    .sidebar{position:static; width:auto; height:auto; border-right:none; border-bottom:1px solid var(--border);}
+    .sidebar nav>ol{columns:2; column-gap:24px;}
+    .sidebar a.sub{display:none;}
+    .content{padding:24px 18px 50px;}
+  }
+  @media print{
+    .sidebar{display:none;} .content{padding:0; max-width:100%;} body{background:#fff;}
+    h2.chh{break-after:avoid;} table,.eg,.note,.tip{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===== 側欄 ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="langsw">
+      <button type="button" data-set="zh" onclick="setDocLang('zh')">中文</button>
+      <button type="button" data-set="ja" onclick="setDocLang('ja')">日本語</button>
+      <button type="button" data-set="en" onclick="setDocLang('en')">EN</button>
+    </div>
+
+    <!-- 側欄:繁中 -->
+    <div data-doc="zh">
+      <p class="brand">🧭 使用說明書</p>
+      <p class="brandsub">出差行程規劃工具</p>
+      <nav><ol>
+        <li><a class="top" href="#zh-c1">1. 簡介與核心特色</a></li>
+        <li><a class="top" href="#zh-c2">2. 開始使用</a></li>
+        <li><a class="top" href="#zh-c3">3. 建立新行程</a></li>
+        <li><a class="top" href="#zh-c4">4. 編輯器導覽</a></li>
+        <li><a class="top" href="#zh-c5">5. 行程編輯</a><ol class="sublist">
+          <li><a class="sub" href="#zh-c5-1">5.1 行程項目與目的地</a></li>
+          <li><a class="sub" href="#zh-c5-2">5.2 移動區間與移動手段</a></li>
+          <li><a class="sub" href="#zh-c5-3">5.3 調整行程順序</a></li>
+          <li><a class="sub" href="#zh-c5-4">5.4 餐食</a></li>
+          <li><a class="sub" href="#zh-c5-5">5.5 住宿飯店</a></li>
+          <li><a class="sub" href="#zh-c5-6">5.6 附件</a></li>
+          <li><a class="sub" href="#zh-c5-7">5.7 時間邏輯提醒</a></li>
+        </ol></li>
+        <li><a class="top" href="#zh-c6">6. 花費與花費總覽</a></li>
+        <li><a class="top" href="#zh-c7">7. 攜帶與購物清單</a></li>
+        <li><a class="top" href="#zh-c8">8. 日程設定</a><ol class="sublist">
+          <li><a class="sub" href="#zh-c8-1">8.1 核心觀念</a></li>
+          <li><a class="sub" href="#zh-c8-2">8.2 面板內容</a></li>
+          <li><a class="sub" href="#zh-c8-3">8.3 調整順序</a></li>
+          <li><a class="sub" href="#zh-c8-4">8.4 增減天數與預覽</a></li>
+          <li><a class="sub" href="#zh-c8-5">8.5 套用與取消</a></li>
+        </ol></li>
+        <li><a class="top" href="#zh-c9">9. 總覽與匯出</a><ol class="sublist">
+          <li><a class="sub" href="#zh-c9-1">9.1 行程總覽</a></li>
+          <li><a class="sub" href="#zh-c9-2">9.2 匯出 PDF</a></li>
+          <li><a class="sub" href="#zh-c9-3">9.3 匯出 Excel</a></li>
+        </ol></li>
+        <li><a class="top" href="#zh-c10">10. 儲存與讀取</a></li>
+        <li><a class="top" href="#zh-c11">11. 設定</a></li>
+        <li><a class="top" href="#zh-c12">12. 提示與常見問題</a></li>
+        <li><a class="top" href="#zh-c13">13. 景點參考與行程建議</a><ol class="sublist">
+          <li><a class="sub" href="#zh-c13-1">13.1 日本景點參考</a></li>
+          <li><a class="sub" href="#zh-c13-2">13.2 景點加入行程</a></li>
+          <li><a class="sub" href="#zh-c13-3">13.3 行程建議範本</a></li>
+        </ol></li>
+      </ol></nav>
+    </div>
+
+    <!-- 側欄:日文 -->
+    <div data-doc="ja">
+      <p class="brand">🧭 ユーザーマニュアル</p>
+      <p class="brandsub">出張旅程プランニングツール</p>
+      <nav><ol>
+        <li><a class="top" href="#ja-c1">1. 概要と特長</a></li>
+        <li><a class="top" href="#ja-c2">2. はじめに</a></li>
+        <li><a class="top" href="#ja-c3">3. 新規作成</a></li>
+        <li><a class="top" href="#ja-c4">4. エディター概要</a></li>
+        <li><a class="top" href="#ja-c5">5. 旅程の編集</a><ol class="sublist">
+          <li><a class="sub" href="#ja-c5-1">5.1 予定と目的地</a></li>
+          <li><a class="sub" href="#ja-c5-2">5.2 移動区間と移動手段</a></li>
+          <li><a class="sub" href="#ja-c5-3">5.3 予定の並べ替え</a></li>
+          <li><a class="sub" href="#ja-c5-4">5.4 食事</a></li>
+          <li><a class="sub" href="#ja-c5-5">5.5 宿泊</a></li>
+          <li><a class="sub" href="#ja-c5-6">5.6 添付</a></li>
+          <li><a class="sub" href="#ja-c5-7">5.7 時間チェック</a></li>
+        </ol></li>
+        <li><a class="top" href="#ja-c6">6. 費用と費用一覧</a></li>
+        <li><a class="top" href="#ja-c7">7. 持ち物・買い物リスト</a></li>
+        <li><a class="top" href="#ja-c8">8. 日程設定</a><ol class="sublist">
+          <li><a class="sub" href="#ja-c8-1">8.1 基本概念</a></li>
+          <li><a class="sub" href="#ja-c8-2">8.2 パネルの内容</a></li>
+          <li><a class="sub" href="#ja-c8-3">8.3 並べ替え</a></li>
+          <li><a class="sub" href="#ja-c8-4">8.4 日数の増減とプレビュー</a></li>
+          <li><a class="sub" href="#ja-c8-5">8.5 適用とキャンセル</a></li>
+        </ol></li>
+        <li><a class="top" href="#ja-c9">9. 概要と出力</a><ol class="sublist">
+          <li><a class="sub" href="#ja-c9-1">9.1 旅程概要</a></li>
+          <li><a class="sub" href="#ja-c9-2">9.2 PDF 出力</a></li>
+          <li><a class="sub" href="#ja-c9-3">9.3 Excel 出力</a></li>
+        </ol></li>
+        <li><a class="top" href="#ja-c10">10. 保存と読み込み</a></li>
+        <li><a class="top" href="#ja-c11">11. 設定</a></li>
+        <li><a class="top" href="#ja-c12">12. ヒントと FAQ</a></li>
+        <li><a class="top" href="#ja-c13">13. 名所参考とおすすめ旅程</a><ol class="sublist">
+          <li><a class="sub" href="#ja-c13-1">13.1 日本の名所</a></li>
+          <li><a class="sub" href="#ja-c13-2">13.2 名所を旅程へ追加</a></li>
+          <li><a class="sub" href="#ja-c13-3">13.3 おすすめ旅程テンプレート</a></li>
+        </ol></li>
+      </ol></nav>
+    </div>
+
+    <!-- 側欄:英文 -->
+    <div data-doc="en">
+      <p class="brand">🧭 User Manual</p>
+      <p class="brandsub">Business Trip Itinerary Planner</p>
+      <nav><ol>
+        <li><a class="top" href="#en-c1">1. Overview &amp; Features</a></li>
+        <li><a class="top" href="#en-c2">2. Getting Started</a></li>
+        <li><a class="top" href="#en-c3">3. Creating an Itinerary</a></li>
+        <li><a class="top" href="#en-c4">4. Editor Tour</a></li>
+        <li><a class="top" href="#en-c5">5. Editing the Itinerary</a><ol class="sublist">
+          <li><a class="sub" href="#en-c5-1">5.1 Activities &amp; Destination</a></li>
+          <li><a class="sub" href="#en-c5-2">5.2 Legs &amp; Transports</a></li>
+          <li><a class="sub" href="#en-c5-3">5.3 Reordering Activities</a></li>
+          <li><a class="sub" href="#en-c5-4">5.4 Meals</a></li>
+          <li><a class="sub" href="#en-c5-5">5.5 Hotels</a></li>
+          <li><a class="sub" href="#en-c5-6">5.6 Attachments</a></li>
+          <li><a class="sub" href="#en-c5-7">5.7 Time Checks</a></li>
+        </ol></li>
+        <li><a class="top" href="#en-c6">6. Costs &amp; Overview</a></li>
+        <li><a class="top" href="#en-c7">7. Packing &amp; Shopping Lists</a></li>
+        <li><a class="top" href="#en-c8">8. Day Setup</a><ol class="sublist">
+          <li><a class="sub" href="#en-c8-1">8.1 Key Concept</a></li>
+          <li><a class="sub" href="#en-c8-2">8.2 Panel Contents</a></li>
+          <li><a class="sub" href="#en-c8-3">8.3 Reordering</a></li>
+          <li><a class="sub" href="#en-c8-4">8.4 Add/Remove Days</a></li>
+          <li><a class="sub" href="#en-c8-5">8.5 Apply &amp; Cancel</a></li>
+        </ol></li>
+        <li><a class="top" href="#en-c9">9. Overview &amp; Export</a><ol class="sublist">
+          <li><a class="sub" href="#en-c9-1">9.1 Itinerary Overview</a></li>
+          <li><a class="sub" href="#en-c9-2">9.2 Export PDF</a></li>
+          <li><a class="sub" href="#en-c9-3">9.3 Export Excel</a></li>
+        </ol></li>
+        <li><a class="top" href="#en-c10">10. Save &amp; Load</a></li>
+        <li><a class="top" href="#en-c11">11. Settings</a></li>
+        <li><a class="top" href="#en-c12">12. Tips &amp; FAQ</a></li>
+        <li><a class="top" href="#en-c13">13. Spots &amp; Suggested Plans</a><ol class="sublist">
+          <li><a class="sub" href="#en-c13-1">13.1 Japan Spots</a></li>
+          <li><a class="sub" href="#en-c13-2">13.2 Adding a spot</a></li>
+          <li><a class="sub" href="#en-c13-3">13.3 Suggested plan templates</a></li>
+        </ol></li>
+      </ol></nav>
+    </div>
+  </aside>
+
+  <!-- ===== 內容 ===== -->
+  <main class="content" id="top">
+
+    <!-- ================= 繁體中文 ================= -->
+    <div class="doc" data-doc="zh">
+      <header class="top">
+        <h1>🧭 出差行程規劃工具 — 使用說明書</h1>
+        <p class="sub">單一自包含 HTML・離線可用・零安裝・繁體中文 / 日本語 / English</p>
+      </header>
+      <div class="note">本工具是一個 <b>單一 HTML 檔</b>(<code>index.html</code>)。<b>雙擊即可用任何瀏覽器離線開啟</b>,不需安裝、不需連網,也不會把任何內容上傳到外部——你輸入的所有資料都只留在你自己的電腦。</div>
+
+      <section class="ch" id="zh-c1"><h2 class="chh">1. 簡介與核心特色</h2>
+        <p>本工具用於規劃出差 / 旅行的<b>多日行程</b>,一份行程可完整記錄:每日行程動線、交通(可多段轉乘)、餐食、住宿、附件(車票 / 訂房單),以及依幣別彙總的花費統計,另附<b>攜帶清單</b>與<b>購物清單</b>。完成後可輸出成 <b>PDF</b> 或 <b>Excel</b>。</p>
+        <h3>設計理念</h3>
+        <ul>
+          <li><b>單檔自包含、離線</b>:整套功能包在一個 HTML 檔內,雙擊即用,無網路也能運作。唯一內含的第三方元件是用於把 PDF 附件轉圖列印的 <b>PDF.js</b>(已內嵌於本檔,純本機運算、<b>不會連網</b>)。</li>
+          <li><b>資料只留本機</b>:不上傳、不外送;編輯過程自動暫存於瀏覽器。</li>
+          <li><b>三語介面</b>:繁中 / 日文 / English,可隨時切換;你輸入的內容不會被翻譯。</li>
+        </ul>
+        <h3>三種檔案的角色(重要)</h3>
+        <table>
+          <tr><th>格式</th><th>角色</th><th>能否再編輯</th></tr>
+          <tr><td><b>JSON</b></td><td>唯一的儲存 / 讀取格式,含全部內容與內嵌附件</td><td>✔ 可完整還原</td></tr>
+          <tr><td><b>PDF</b></td><td>交付 / 列印用輸出(走瀏覽器列印)</td><td>✘ 僅輸出</td></tr>
+          <tr><td><b>Excel</b></td><td>表格整理用輸出</td><td>✘ 僅輸出</td></tr>
+        </table>
+        <div class="tip"><b>一句話原則</b>:要「之後還能改」就存 <b>JSON</b>;要「給別人 / 列印 / 歸檔」就輸出 <b>PDF</b> 或 <b>Excel</b>。</div>
+      </section>
+
+      <section class="ch" id="zh-c2"><h2 class="chh">2. 開始使用</h2>
+        <h3>2.1 開啟工具</h3>
+        <p><b>雙擊 <code>index.html</code></b>,以預設瀏覽器開啟(建議 Chrome / Edge)。首次為繁體中文,可於設定更改。</p>
+        <h3>2.2 首頁</h3>
+        <p>首頁標題「<b>行程規劃</b>」,提供三個入口:</p>
+        <table>
+          <tr><th>項目</th><th>說明</th></tr>
+          <tr><td><span class="btn">新建行程</span></td><td>從頭建立一份新行程(第 3 章)。</td></tr>
+          <tr><td><span class="btn g">讀取行程</span></td><td>開啟先前另存的 <code>.json</code> 續編(第 10 章)。</td></tr>
+          <tr><td><span class="btn g">↻ 繼續上次行程</span></td><td>有上次未關閉的行程時才出現;載回上次行程繼續編輯(第 10 章)。</td></tr>
+          <tr><td><span class="btn g">⚙️ 設定</span></td><td>佈景 / 幣別 / 語言,頂端常駐(第 11 章)。</td></tr>
+        </table>
+        <div class="tip"><b>提示</b>:語言 / 佈景 / 幣別為「全域偏好」,會被記住並由新行程繼承。</div>
+      </section>
+
+      <section class="ch" id="zh-c3"><h2 class="chh">3. 建立新行程</h2>
+        <p>首頁點「新建行程」,依序填寫:</p>
+        <ol class="steps">
+          <li><b>出發日期</b>:以「年 / 月 / 日」三下拉選取。之後每天日期依「排第幾天」自動推算。</li>
+          <li><b>總天數</b>:1–60;日後仍可於「日程設定」增減(第 8 章)。</li>
+          <li><b>行程名稱</b>:例「中部供應商稽核」,會與出發日組成標題 / 檔名。</li>
+          <li>確認預覽的「產生的行程標題」(<code>yyyymmdd行程名稱</code>)後按 <span class="btn">建立行程表</span>。</li>
+        </ol>
+      </section>
+
+      <section class="ch" id="zh-c4"><h2 class="chh">4. 編輯器導覽</h2>
+        <h3>4.1 四大分頁</h3>
+        <table>
+          <tr><th>分頁</th><th>用途</th></tr>
+          <tr><td><b>行程</b></td><td>逐日編輯行程、交通、餐食、住宿、附件(第 5 章)。</td></tr>
+          <tr><td><b>花費總覽</b></td><td>依幣別彙總花費(第 6 章)。</td></tr>
+          <tr><td><b>攜帶清單 / 購物清單</b></td><td>物品與採買清單(第 7 章)。</td></tr>
+        </table>
+        <h3>4.2 標題</h3>
+        <p>上方標題可直接點擊修改;不改則用「<code>yyyymmdd行程名稱</code>+天數後綴」預設。用於 PDF / Excel 內文與檔名。</p>
+        <h3>4.3 顯示模式</h3>
+        <p>「行程」與「花費總覽」各有 <span class="btn">🗂️ 逐日顯示</span> / <span class="btn">📄 一頁顯示</span> 切換,僅影響檢視,不影響輸出。</p>
+        <h3 id="zh-c4-4">4.4 右下角浮動按鈕</h3>
+        <p>編輯行程時,畫面<b>右下角</b>常駐兩顆浮動按鈕(由下而上堆疊):</p>
+        <table>
+          <tr><th>按鈕</th><th>功能</th></tr>
+          <tr><td><span class="btn">🗓️ 日程設定</span></td><td>調整出發日期、總天數、各天順序(見第 8 章)。</td></tr>
+          <tr><td><span class="btn">📋 行程總覽</span></td><td>開啟完整預覽,並可匯出 PDF / Excel(見第 9 章)。</td></tr>
+        </table>
+        <div class="tip"><b>拖曳排序</b>:兩處可用滑鼠拖曳(按住 <code>⠿</code> 握把)——同一天內的<b>行程項目</b>(見 5.3)、日程設定面板內的<b>各天</b>(見 8.3);兩者也都能用 <span class="btn">▲</span> <span class="btn">▼</span> 按鈕。</div>
+      </section>
+
+      <section class="ch" id="zh-c5"><h2 class="chh">5. 行程編輯</h2>
+        <p>每一天由四區塊組成:<b>行程</b>、<b>餐食</b>、<b>住宿飯店</b>、<b>附件</b>。</p>
+        <h3 id="zh-c5-1">5.1 行程項目與目的地</h3>
+        <p>按 <span class="btn">＋ 新增行程</span>。欄位:</p>
+        <table>
+          <tr><th>欄位</th><th>說明</th></tr>
+          <tr><td><b>目的地</b></td><td>主標題(可留空);<b>留空時自動改用「抵達地」</b>。</td></tr>
+          <tr><td><b>出發地 / 出發時間</b></td><td>起點與時間(24 小時制,點欄位可捲動挑選)。</td></tr>
+          <tr><td><b>抵達地 / 抵達時間</b></td><td>終點與時間。</td></tr>
+          <tr><td><b>移動區間</b></td><td>交通方式(見 5.2)。</td></tr>
+          <tr><td><b>備註</b></td><td>補充說明。</td></tr>
+        </table>
+        <div class="eg"><span class="lbl">範例</span><br>目的地:台中高鐵站　·　高雄 06:55 → 台中高鐵 10:55</div>
+        <div class="tip"><b>🗺️ 地圖(本檔為「連網版」專屬)</b>:「行程 N」右側的 <span class="btn">🗺️</span> 可<b>在卡片內展開 Google 地圖</b>,自動顯示<b>「出發地 → 抵達地」的路線</b>(抵達地留空時改用「目的地」;只填一端則單點顯示該地點)。地圖下方有 <b>「在 Google 地圖開啟 ↗」</b> 可改用新分頁看完整地圖。<br>
+          · <b>每天一張完整路線圖</b>:每天標題列右側有 <span class="btn">🗺️ 本日路線</span>,會把當天所有行程<b>依序串成一條多點路線</b>。若下一筆行程的出發地就是上一筆的抵達地,該地點<b>只算一個點</b>(A→B、B→C 得到 <b>A→B→C</b>);若出發地不同,則兩個點都保留(A→B、B'→C 得到 <b>A→B→B'→C</b>)。<br>
+          · 本日路線的兩個限制:<b>大眾運輸不支援多點路線</b>(有中途點時會自動改以開車模式顯示,要查大眾運輸請用單筆行程的地圖);中途點<b>上限 9 個</b>,超過時會省略中間的點並在地圖下方明確告知省略了幾個(起點與終點一定保留)。<br>
+          · 地圖上方有四個<b>交通模式</b>:<b>🚗 開車 / 🚆 大眾運輸 / 🚶 步行 / 🚲 自行車</b>,點選即以該模式重新載入,並記住您的選擇(下一筆行程展開時沿用)。<br>
+          · <b>「銀座線 或 JR」這類多條建議路線,請點「在 Google 地圖開啟 ↗」</b>——它會帶著您目前選的模式開啟,Google 地圖網頁才會列出各路線的時間與轉乘。卡片內的小地圖只畫一條路線,這是內嵌地圖的限制。<br>
+          · 同時<b>只會展開一個</b>地圖(展開新的會自動收合舊的),再按一次 <span class="btn">🗺️</span> 即收合。<br>
+          · 修改地點欄位後,<b>收合再展開</b>即以新地點重新載入。<br>
+          · 地圖<b>需要網路</b>(展開的那一刻才向 Google 載入);地圖不會出現在 PDF / Excel 輸出中。若您所在環境禁止連外,請改用 <code>offline/</code> 的<b>離線版</b>(無此功能,亦不含任何連網程式碼)。</div>
+        <h3 id="zh-c5-2">5.2 移動區間與移動手段</h3>
+        <p>「移動區間」內可放<b>多個「移動手段」</b>描述轉乘。每段可填:手段 / 交通工具名稱、出發地 → 抵達地、出發 / 抵達時間、<b>移動時間</b>、花費。</p>
+        <div class="eg"><span class="lbl">轉乘範例</span><br>手段 1:高鐵(高雄→台中)08:00–09:00　·　手段 2:計程車(台中站→飯店)09:10–09:30</div>
+        <div class="tip"><b>移動時間</b>:當某段的<b>起訖時間不確定</b>時,可只填「移動時間」(分鐘,最多 3 位數,不參與時間邏輯檢查)。輸出時:兩個起訖時間都有 → 依起訖時間;<b>缺一個或都沒填 → 在路線後顯示「移動xx分」底色徽章</b>;Excel 另有「移動時間」欄顯示「xx分」。</div>
+        <h3 id="zh-c5-3">5.3 調整行程順序</h3>
+        <ul>
+          <li><b>▲ / ▼ 按鈕</b>:與相鄰行程對調(手機 / 桌機皆可)。</li>
+          <li><b>拖曳(桌機)</b>:按住標題列 <code>⠿</code> 握把拖動;拖到視窗邊緣會自動捲動,限同一天內。</li>
+        </ul>
+        <h3 id="zh-c5-4">5.4 餐食</h3>
+        <p>按 <span class="btn">＋ 新增餐食</span>。欄位:名稱、地址、電話、傳真、Email、網站、用餐時間、是否已訂位 / 訂位時間、預估花費。</p>
+        <h3 id="zh-c5-5">5.5 住宿飯店</h3>
+        <p>按 <span class="btn">＋ 新增住宿飯店</span>。欄位:名稱、地址、電話、傳真、Email、網站、入住 / 退房、住宿費用。</p>
+        <h3 id="zh-c5-6">5.6 附件</h3>
+        <p>按 <span class="btn">＋ 匯入附件</span> 匯入<b>圖片</b>或 <b>PDF</b>;附件<b>內嵌於行程檔</b>,JSON 會一併攜帶。</p>
+        <div class="note blue">輸出呈現:<b>圖片</b>在 PDF 每張一頁、Excel 內嵌;<b>PDF 附件</b>會<b>逐頁轉成圖片</b>,接在圖片附件之後印出(每頁一頁),因此行程與各式憑證可一次列印完成。</div>
+        <div class="note">・轉換於按 <span class="btn">📄 匯出 PDF</span> 或 <span class="btn">📋 行程總覽</span> 時進行;附件多時需稍等,畫面會顯示進度提示。<br>・單一 PDF 附件<b>最多轉 30 頁</b>;超出的頁數會在該附件最後一頁<b>明確標示省略幾頁</b>,不會默默截斷。<br>・少數 PDF(例如加密檔)可能無法轉換,這些會<b>退回末頁清單</b>呈現;原檔仍可在工具內開啟。</div>
+        <h3 id="zh-c5-7">5.7 時間邏輯提醒</h3>
+        <p>時間不合理時以<b>紅字即時提醒</b>(行程間出發遞增、抵達不早於出發、移動段落在範圍內)。<b>只在編輯畫面顯示,不進輸出</b>;留空自動略過。</p>
+      </section>
+
+      <section class="ch" id="zh-c6"><h2 class="chh">6. 花費與花費總覽</h2>
+        <p>交通、餐食、住宿、購物都可記花費,每筆為「<b>金額 + 幣別</b>」(共 18 種)。</p>
+        <div class="note">・<b>留空不計</b>入統計。<br>・<b>不同幣別分別加總,不做匯率換算</b>。</div>
+        <p>「花費總覽」分頁<b>依幣別分組</b>列出交通 / 餐食 / 住宿與小計,可切 <span class="btn">🗂️ 逐日</span> / <span class="btn">📄 一頁</span>;0 值列與整組為 0 的幣別自動隱藏。</p>
+      </section>
+
+      <section class="ch" id="zh-c7"><h2 class="chh">7. 攜帶與購物清單</h2>
+        <p>兩者操作相同,各可建<b>多份</b>清單(子頁籤切換):</p>
+        <table>
+          <tr><th>清單</th><th>項目可填</th></tr>
+          <tr><td><b>攜帶清單</b></td><td>名稱、數量、小圖。</td></tr>
+          <tr><td><b>購物清單</b></td><td>名稱、數量、圖片、<b>預估花費</b>(納入統計)。</td></tr>
+        </table>
+        <p>以 <span class="btn">＋ 新增清單</span> 建立、<span class="btn">＋</span> 新增項目、<span class="btn d">－</span> 刪除。</p>
+      </section>
+
+      <section class="ch" id="zh-c8"><h2 class="chh">8. 日程設定</h2>
+        <p>點右下角 <span class="btn">🗓️ 日程設定</span> 開啟,可調整<b>出發日期、總天數、各天順序</b>。</p>
+        <h3 id="zh-c8-1">8.1 核心觀念:日期綁「位置」</h3>
+        <div class="note red"><b>每天日期由「排第幾天」自動算出,不綁在該天身上。</b>調整順序 / 天數搬動的是「該天內容」,第 1 天永遠是出發日。<b>例</b>:把第 3 天移到第 1 天 = 原第 3 天的安排改到出發日進行。</div>
+        <h3 id="zh-c8-2">8.2 面板內容</h3>
+        <ul>
+          <li><b>出發日期</b>(三下拉)、<b>總天數</b>(1–60)。</li>
+          <li>各天列:第 N 天・日期(星期)・<b>起點 → 終點</b>路線摘要(便於辨識相似的天)。</li>
+          <li>底部顯示變更摘要,將刪除且含內容者以紅字警示。</li>
+        </ul>
+        <h3 id="zh-c8-3">8.3 調整順序(即時預覽)</h3>
+        <p>▲▼ 或拖曳 <code>⠿</code>,主畫面即時反映。逐日模式下會持續跟著你正在移動的那天。</p>
+        <h3 id="zh-c8-4">8.4 增減天數與預覽</h3>
+        <p><b>減少</b>時超出的天先在刪除線下<b>預覽</b>(不立即刪),按套用才刪;含內容會再確認;套用前可 ▲▼ / 拖曳把要保留的天<b>移到線上搶救</b>。<b>增加</b>時預覽新增的空白天。</p>
+        <h3 id="zh-c8-5">8.5 套用與取消</h3>
+        <table>
+          <tr><th>動作</th><th>結果</th></tr>
+          <tr><td><span class="btn">✓ 套用</span></td><td>確認變更並生效。</td></tr>
+          <tr><td><span class="btn g">取消 / ✕ / 點面板外</span></td><td>放棄變更,<b>還原到開啟前</b>。</td></tr>
+        </table>
+      </section>
+
+      <section class="ch" id="zh-c9"><h2 class="chh">9. 總覽與匯出</h2>
+        <h3 id="zh-c9-1">9.1 行程總覽</h3>
+        <p>點 <span class="btn">📋 行程總覽</span> 彈出完整預覽(與 PDF 一致),上方有匯出鈕。</p>
+        <h3 id="zh-c9-2">9.2 匯出 PDF</h3>
+        <ol class="steps">
+          <li>點 <span class="btn">📄 匯出 PDF</span>。<b>要把 PDF 附件的內容印出來,一定要用這個鈕</b>;直接按 <span class="kbd">Ctrl</span>+<span class="kbd">P</span> 時 PDF 附件只會以末頁清單呈現。</li>
+          <li>目的地選「<b>另存為 PDF</b>」。</li>
+          <li>檔名自動帶入標題,確認版面後儲存。</li>
+        </ol>
+        <p>順序:標題 → 各日 → 一頁式費用總覽 → 清單 → 圖片附件(每張一頁)→ <b>PDF 附件的逐頁內容</b>(每頁一頁)→ 無法轉換的 PDF 附件清單。列印一律淺色。</p>
+        <h3 id="zh-c9-3">9.3 匯出 Excel</h3>
+        <p>點 <span class="btn">📊 匯出 Excel</span> 產生 <code>.xlsx</code>,分頁:行程表 / 餐食 / 住宿 / 花費總覽 + 各清單;圖片內嵌、Email / 網站為超連結。</p>
+        <div class="note blue">PDF / Excel <b>無法讀回編輯</b>,要再編請存 JSON。</div>
+      </section>
+
+      <section class="ch" id="zh-c10"><h2 class="chh">10. 儲存與讀取</h2>
+        <p><b>JSON 是唯一可完整還原編輯的格式。</b></p>
+        <table>
+          <tr><th>按鈕</th><th>行為</th></tr>
+          <tr><td><span class="btn">📂 讀取行程</span></td><td>開啟 <code>.json</code> 續編(舊版自動相容)。</td></tr>
+          <tr><td><span class="btn">💾 儲存行程</span></td><td>若此行程有<b>來源檔</b>(經讀取或另存過)→ <b>直接寫回原檔</b>;否則等同另存新檔。</td></tr>
+          <tr><td><span class="btn">📁 另存新檔</span></td><td>選擇位置存成新檔,之後「儲存」會改寫入這個新檔。</td></tr>
+        </table>
+        <div class="tip"><b>原檔回存與資料夾記憶</b>(Chrome / Edge):讀取或另存後會記住檔案與所在資料夾;下次讀檔/存檔的選擇器會<b>從上次資料夾開始</b>,關閉瀏覽器重開仍有效。首次寫回原檔時瀏覽器會<b>詢問一次寫入權限</b>,允許即可。</div>
+        <ul>
+          <li><b>繼續上次行程</b>:啟動預設回首頁;若曾開啟過檔案,首頁會出現「<b>↻ 繼續上次行程</b>」,點了會<b>直接讀取「最後開啟的那個實體檔」的目前內容</b>(不是讀瀏覽器暫存)。因此該檔<b>已刪除 / 移動則會報錯</b>,不會載回舊資料。</li>
+          <li><b>自動暫存</b>:編輯過程存於瀏覽器(localStorage),只保留最後一次、與該瀏覽器綁定(此為安全網,「繼續」不使用它)。</li>
+        </ul>
+        <div class="note red"><b>務必自行另存 JSON 備份</b>——清除瀏覽器資料 / 換機 / 換瀏覽器都會使自動暫存與路徑記憶遺失。</div>
+        <div class="note"><b>關於權限提示</b>:讀寫離線檔通常直接進行、不跳提示;但<b>關閉瀏覽器重開後第一次存取檔案時,瀏覽器(Edge/Chrome)會原生要求確認一次</b>(「是否允許檢視/編輯檔案」),此為瀏覽器資安機制,程式無法移除。<br><b>關於資料位置</b>:工具全程離線,不上傳、不複製到其他位置;僅在本機瀏覽器保存自動暫存(localStorage)與檔案參照(IndexedDB)。<br><b>file://(雙擊)</b>下少數瀏覽器版本不支援原檔回存 / 資料夾記憶而退回<b>下載</b>;改以 localhost 開啟即穩定。Firefox / Safari 不支援,一律走下載。</div>
+      </section>
+
+      <section class="ch" id="zh-c11"><h2 class="chh">11. 設定</h2>
+        <table>
+          <tr><th>項目</th><th>選項</th></tr>
+          <tr><td><b>佈景模式</b></td><td>一般 / 深色 / 柔和(僅影響編輯畫面)。</td></tr>
+          <tr><td><b>預設幣別</b></td><td>新花費預設幣別(18 種)。</td></tr>
+          <tr><td><b>語言</b></td><td>繁中 / 日文 / English,即時生效。</td></tr>
+        </table>
+        <p>屬全域偏好,新行程繼承;開啟既有行程以該檔設定為準。<b>列印一律淺色</b>;<b>使用者輸入的資料不翻譯</b>。</p>
+      </section>
+
+      <section class="ch" id="zh-c12"><h2 class="chh">12. 提示與常見問題</h2>
+        <table>
+          <tr><th>問題</th><th>說明</th></tr>
+          <tr><td>會上傳資料嗎?</td><td>不會,完全離線,資料只留本機。</td></tr>
+          <tr><td>換電腦行程不見?</td><td>先另存 JSON 帶到新電腦再讀取。</td></tr>
+          <tr><td>花費沒算到?</td><td>金額留空不計;確認已填金額並選幣別。</td></tr>
+          <tr><td>減天數想反悔?</td><td>未按套用前按取消即還原;已套用請讀 JSON 備份。</td></tr>
+        </table>
+        <div class="note">資安 / 帳號 / 網路問題洽 IT;合約 / 法務洽法務窗口。程式碼、組態、指令在正式使用前請自行審查驗證。</div>
+      </section>
+
+      <section class="ch" id="zh-c13"><h2 class="chh">13. 景點參考與行程建議</h2>
+        <p>工具內建日本 47 都道府県、660 筆景點的參考資料(全部離線,不連網)。可單純查閱,也可直接帶進行程。</p>
+
+        <h3 id="zh-c13-1">13.1 日本景點參考</h3>
+        <p>編輯畫面<b>左下角 🗾 日本景點參考</b>開啟。先選都道府県,再依分類(風景區 / 神社 / 寺廟 / 城郭 / 博物館・美術館 / 主題樂園 / 溫泉 / 地標・其他)瀏覽;點景點名稱可展開<b>地址、電話、網站</b>。沒有資料的欄位顯示「—」。</p>
+        <div class="note">此為<b>參考資料</b>,不會進入 JSON / PDF / Excel。地址與電話以 Google 地圖為準,出發前仍建議自行再確認營業時間與公休日。</div>
+
+        <h3 id="zh-c13-2">13.2 景點加入行程</h3>
+        <p>展開景點後,名稱右側會出現<b>「設為出發」與「設為抵達」</b>兩顆按鈕:</p>
+        <ol>
+          <li>按下後選擇要放入的<b>日期</b>(下拉選單列出目前所有天)。</li>
+          <li>清單會顯示該天既有的行程項目摘要,點任一筆即把景點填入該筆的<b>出發地</b>或<b>抵達地</b>。</li>
+          <li>或按<b>「＋ 新增行程項目」</b>,直接在該天新增一筆並填入景點。</li>
+        </ol>
+        <p>填入後畫面立即更新並自動暫存,之後可照一般方式編輯時間、備註與移動區間。</p>
+
+        <h3 id="zh-c13-3">13.3 行程建議範本</h3>
+        <p><b>首頁 🗺️ 行程建議</b>提供 8 個熱門目的地 × 3 / 5 / 7 日,共 24 套依旅行團經典路線整理的範本:</p>
+        <table>
+          <tr><th>目的地</th><th>涵蓋範圍</th></tr>
+          <tr><td>東京</td><td>東京・橫濱鎌倉・富士山・箱根・日光</td></tr>
+          <tr><td>大阪・京都(關西)</td><td>大阪・京都・奈良・神戶姬路</td></tr>
+          <tr><td>北海道</td><td>札幌小樽・洞爺登別・富良野美瑛・函館</td></tr>
+          <tr><td>沖繩</td><td>那霸・中北部・南部・離島</td></tr>
+          <tr><td>名古屋・北陸(昇龍道)</td><td>名古屋・飛驒高山・白川鄉・金澤・立山黑部</td></tr>
+          <tr><td>九州</td><td>福岡・由布院別府・阿蘇熊本・長崎・高千穗宮崎・鹿兒島</td></tr>
+          <tr><td>東北</td><td>仙台松島・山形藏王銀山・岩手秋田・青森</td></tr>
+          <tr><td>廣島・四國(瀨戶內)</td><td>廣島宮島・尾道島波海道・松山・香川・岡山倉敷</td></tr>
+        </table>
+        <p>選好目的地後按天數按鈕,立即建立行程並進入編輯畫面。出發日期預設為<b>今天</b>,行程名稱為目的地名稱,兩者都可以再改。</p>
+        <div class="note"><b>範本只安排景點</b>,不含餐食與住宿;時間、交通與花費也都留白,請自行補上。若目前已開啟行程,產生範本前會先詢問是否覆蓋——<b>建議先儲存目前行程再產生</b>。</div>
+      </section>
+      <footer>出差行程規劃工具 使用說明書 ・ 單一自包含 HTML 版本</footer>
+    </div>
+
+    <!-- ================= 日本語 ================= -->
+    <div class="doc" data-doc="ja">
+      <header class="top">
+        <h1>🧭 出張旅程プランニングツール — ユーザーマニュアル</h1>
+        <p class="sub">単一自己完結型 HTML・オフライン対応・インストール不要・繁体字中国語 / 日本語 / English</p>
+      </header>
+      <div class="note">本ツールは <b>単一の HTML ファイル</b>(<code>index.html</code>)です。<b>ダブルクリックで任意のブラウザによりオフラインで開けます</b>。インストール・通信は不要で、入力内容は外部に送信されず、すべてご自身のパソコンにのみ保存されます。</div>
+
+      <section class="ch" id="ja-c1"><h2 class="chh">1. 概要と特長</h2>
+        <p>出張・旅行の<b>複数日の旅程</b>を計画するツールです。各日の行程、交通(乗り換え複数可)、食事、宿泊、添付(切符 / 予約確認書)、通貨別の費用集計に加え、<b>持ち物リスト</b>と<b>買い物リスト</b>を記録でき、<b>PDF</b> / <b>Excel</b> に出力できます。</p>
+        <h3>設計思想</h3>
+        <ul>
+          <li><b>単一ファイル完結・オフライン</b>:全機能が 1 つの HTML に収まり、ネットなしでも動作。同梱される唯一の外部コンポーネントは PDF 添付の画像化に使う <b>PDF.js</b>(本ファイルに埋め込み、ローカル処理のみで<b>通信しません</b>)。</li>
+          <li><b>データは端末内のみ</b>:アップロードせず、編集中はブラウザに自動保存。</li>
+          <li><b>3 言語対応</b>:繁体字 / 日本語 / English。入力内容は翻訳されません。</li>
+        </ul>
+        <h3>3 種類のファイルの役割(重要)</h3>
+        <table>
+          <tr><th>形式</th><th>役割</th><th>再編集</th></tr>
+          <tr><td><b>JSON</b></td><td>唯一の保存 / 読込形式。全内容と添付を含む</td><td>✔ 完全復元可</td></tr>
+          <tr><td><b>PDF</b></td><td>配布 / 印刷用出力(ブラウザ印刷)</td><td>✘ 出力のみ</td></tr>
+          <tr><td><b>Excel</b></td><td>表形式の出力</td><td>✘ 出力のみ</td></tr>
+        </table>
+        <div class="tip"><b>原則</b>:「後で編集する」なら <b>JSON</b> で保存、「共有 / 印刷 / 保管」なら <b>PDF</b> / <b>Excel</b> で出力。</div>
+      </section>
+
+      <section class="ch" id="ja-c2"><h2 class="chh">2. はじめに</h2>
+        <h3>2.1 起動</h3>
+        <p><b><code>index.html</code> をダブルクリック</b>して既定のブラウザで開きます(Chrome / Edge 推奨)。初回は繁体字中国語で、設定から変更できます。</p>
+        <h3>2.2 ホーム画面</h3>
+        <p>タイトルは「<b>旅程プランニング</b>」。3 つの入口:</p>
+        <table>
+          <tr><th>項目</th><th>説明</th></tr>
+          <tr><td><span class="btn">新規作成</span></td><td>新しい旅程を作成(第 3 章)。</td></tr>
+          <tr><td><span class="btn g">読み込み</span></td><td>保存済み <code>.json</code> を開いて続行(第 10 章)。</td></tr>
+          <tr><td><span class="btn g">↻ 前回の続き</span></td><td>前回の旅程がある場合のみ表示;前回の旅程を復元して続行(第 10 章)。</td></tr>
+          <tr><td><span class="btn g">⚙️ 設定</span></td><td>テーマ / 通貨 / 言語。上部に常駐(第 11 章)。</td></tr>
+        </table>
+        <div class="tip"><b>ヒント</b>:言語 / テーマ / 通貨は「全体設定」として記憶され、新規旅程に引き継がれます。</div>
+      </section>
+
+      <section class="ch" id="ja-c3"><h2 class="chh">3. 新規作成</h2>
+        <p>「新規作成」を押し、順に入力:</p>
+        <ol class="steps">
+          <li><b>出発日</b>:年 / 月 / 日の 3 つのドロップダウンで選択。各日の日付は「何日目か」で自動計算されます。</li>
+          <li><b>日数</b>:1〜60。後から「日程設定」で増減可(第 8 章)。</li>
+          <li><b>旅程名</b>:例「中部サプライヤー監査」。出発日と合わせてタイトル / ファイル名になります。</li>
+          <li>プレビュー(<code>yyyymmdd旅程名</code>)を確認し <span class="btn">作成</span>。</li>
+        </ol>
+      </section>
+
+      <section class="ch" id="ja-c4"><h2 class="chh">4. エディター概要</h2>
+        <h3>4.1 4 つのタブ</h3>
+        <table>
+          <tr><th>タブ</th><th>用途</th></tr>
+          <tr><td><b>旅程</b></td><td>日ごとに行程・交通・食事・宿泊・添付を編集(第 5 章)。</td></tr>
+          <tr><td><b>費用一覧</b></td><td>通貨別に費用を集計(第 6 章)。</td></tr>
+          <tr><td><b>持ち物 / 買い物リスト</b></td><td>物品と買い物のリスト(第 7 章)。</td></tr>
+        </table>
+        <h3>4.2 タイトル</h3>
+        <p>上部のタイトルは直接編集可。未編集なら「<code>yyyymmdd旅程名</code>+日数」が既定。PDF / Excel の本文とファイル名に使用。</p>
+        <h3>4.3 表示モード</h3>
+        <p>「旅程」「費用一覧」に <span class="btn">🗂️ 日別表示</span> / <span class="btn">📄 1ページ表示</span> の切替。表示のみで出力には影響しません。</p>
+        <h3 id="ja-c4-4">4.4 右下のフローティングボタン</h3>
+        <p>旅程の編集中、画面<b>右下</b>に 2 つのフローティングボタンが常駐します(下から上に重なる):</p>
+        <table>
+          <tr><th>ボタン</th><th>機能</th></tr>
+          <tr><td><span class="btn">🗓️ 日程設定</span></td><td>出発日・日数・順序を調整(第 8 章)。</td></tr>
+          <tr><td><span class="btn">📋 旅程概要</span></td><td>全体プレビューを開き、PDF / Excel を出力(第 9 章)。</td></tr>
+        </table>
+        <div class="tip"><b>ドラッグ並べ替え</b>:2 箇所でマウスドラッグ可(<code>⠿</code> を掴む)——同一日内の<b>予定</b>(5.3)、日程設定パネル内の<b>各日</b>(8.3)。いずれも <span class="btn">▲</span> <span class="btn">▼</span> ボタンでも操作できます。</div>
+      </section>
+
+      <section class="ch" id="ja-c5"><h2 class="chh">5. 旅程の編集</h2>
+        <p>各日は 4 ブロック:<b>予定</b>、<b>食事</b>、<b>宿泊</b>、<b>添付</b>。</p>
+        <h3 id="ja-c5-1">5.1 予定と目的地</h3>
+        <p><span class="btn">＋ 予定を追加</span>。項目:</p>
+        <table>
+          <tr><th>項目</th><th>説明</th></tr>
+          <tr><td><b>目的地</b></td><td>見出し(空欄可)。<b>空欄時は「到着地」を使用</b>。</td></tr>
+          <tr><td><b>出発地 / 出発時刻</b></td><td>起点と時刻(24 時間制、タップで選択)。</td></tr>
+          <tr><td><b>到着地 / 到着時刻</b></td><td>終点と時刻。</td></tr>
+          <tr><td><b>移動区間</b></td><td>交通手段(5.2)。</td></tr>
+          <tr><td><b>メモ</b></td><td>補足。</td></tr>
+        </table>
+        <div class="eg"><span class="lbl">例</span><br>目的地:台中新幹線駅　·　高雄 06:55 → 台中新幹線 10:55</div>
+        <div class="tip"><b>🗺️ 地図(本ファイル「オンライン版」専用)</b>:「予定 N」の右の <span class="btn">🗺️</span> で<b>カード内に Google マップを開き</b>、<b>「出発地 → 到着地」のルート</b>を表示します(到着地が空欄なら「目的地」を使用。片方のみならその地点を表示)。地図の下の <b>「Google マップで開く ↗」</b> で新しいタブに全画面表示もできます。<br>
+          · <b>1 日分のルート図</b>:各日の見出し右の <span class="btn">🗺️ この日のルート</span> で、その日の全予定を<b>順につないだ複数地点のルート</b>を表示します。次の予定の出発地が前の予定の到着地と同じ場合、その地点は<b>1 つとして扱われます</b>(A→B、B→C なら <b>A→B→C</b>)。異なる場合は両方を残します(A→B、B'→C なら <b>A→B→B'→C</b>)。<br>
+          · この機能の制約 2 点:<b>公共交通は経由地に非対応</b>(経由地がある場合は自動で車モード表示。公共交通は各予定の地図をご利用ください)、経由地は<b>最大 9 か所</b>(超過分は途中の地点を省略し、省略数を地図の下に明示します。出発地と目的地は必ず残ります)。<br>
+          · 地図の上に<b>移動手段</b>の切り替えがあります:<b>🚗 車 / 🚆 公共交通 / 🚶 徒歩 / 🚲 自転車</b>。選ぶとその手段で再読み込みし、選択は記憶されます(次の予定でも同じ手段で開きます)。<br>
+          · <b>「銀座線 か JR」のような複数の経路候補は「Google マップで開く ↗」から</b>ご確認ください——選択中の手段を引き継いで開き、Google マップ側で各経路の所要時間と乗り換えが一覧表示されます。カード内の地図は 1 本の経路のみ表示します(埋め込み地図の制約)。<br>
+          · 地図は<b>同時に 1 つだけ</b>開きます(新しく開くと前のものは自動で閉じます)。もう一度 <span class="btn">🗺️</span> を押すと閉じます。<br>
+          · 地点を書き換えた後は、<b>閉じて開き直す</b>と新しい地点で再読み込みされます。<br>
+          · 地図は<b>インターネット接続が必要</b>です(開いた時点で Google から読み込み)。PDF / Excel の出力には含まれません。外部接続が禁止された環境では <code>offline/</code> の<b>オフライン版</b>(この機能なし・通信コードも一切なし)をご利用ください。</div>
+        <h3 id="ja-c5-2">5.2 移動区間と移動手段</h3>
+        <p>「移動区間」内に<b>複数の「移動手段」</b>を入れ乗り換えを表現。各手段:手段 / 交通機関名、出発地 → 到着地、出発 / 到着時刻、<b>所要時間</b>、費用。</p>
+        <div class="eg"><span class="lbl">乗り換え例</span><br>手段 1:新幹線(高雄→台中)08:00–09:00　·　手段 2:タクシー(台中駅→ホテル)09:10–09:30</div>
+        <div class="tip"><b>所要時間</b>:区間の<b>発着時刻が不確定</b>な場合は「所要時間」(分、最大 3 桁、時間チェック対象外)だけ入力できます。出力時:発着時刻が両方あれば時刻を優先;<b>片方のみ・または両方空なら、経路の後に「移動xx分」の色付きバッジ</b>を表示;Excel には「所要時間」列に「xx分」を表示。</div>
+        <h3 id="ja-c5-3">5.3 予定の並べ替え</h3>
+        <ul>
+          <li><b>▲ / ▼ ボタン</b>:隣と入れ替え(モバイル / PC 可)。</li>
+          <li><b>ドラッグ(PC)</b>:見出し左の <code>⠿</code> を掴んで移動。画面端で自動スクロール、同一日内のみ。</li>
+        </ul>
+        <h3 id="ja-c5-4">5.4 食事</h3>
+        <p><span class="btn">＋ 食事を追加</span>。項目:名称、住所、電話、FAX、Email、Web、食事時刻、予約有無 / 予約時刻、概算費用。</p>
+        <h3 id="ja-c5-5">5.5 宿泊</h3>
+        <p><span class="btn">＋ 宿泊を追加</span>。項目:名称、住所、電話、FAX、Email、Web、チェックイン / アウト、宿泊費。</p>
+        <h3 id="ja-c5-6">5.6 添付</h3>
+        <p><span class="btn">＋ 添付を取込</span> で<b>画像</b>または <b>PDF</b> を取込。添付は<b>旅程ファイルに埋め込まれ</b>、JSON に同梱されます。</p>
+        <div class="note blue">出力時:<b>画像</b>は PDF で 1 枚 1 ページ、Excel に埋め込み;<b>PDF 添付</b>は<b>ページ単位で画像化</b>し、画像添付の後に 1 ページずつ印刷されます。旅程と各種控えをまとめて印刷できます。</div>
+        <div class="note">・変換は <span class="btn">📄 PDF 出力</span> または <span class="btn">📋 旅程概要</span> を押したときに実行されます。添付が多い場合は少し時間がかかり、進捗が表示されます。<br>・1 つの PDF 添付につき<b>最大 30 ページ</b>。超過分は当該添付の最終ページに<b>省略ページ数を明示</b>します(黙って切り捨てません)。<br>・暗号化 PDF など変換できない場合は<b>末尾の一覧表示に戻ります</b>。原本はツール内で開けます。</div>
+        <h3 id="ja-c5-7">5.7 時間チェック</h3>
+        <p>時間が不整合だと<b>赤字で即時警告</b>(予定間の出発は昇順、到着は出発以降、移動は範囲内)。<b>編集画面のみで出力されません</b>;空欄はスキップ。</p>
+      </section>
+
+      <section class="ch" id="ja-c6"><h2 class="chh">6. 費用と費用一覧</h2>
+        <p>交通・食事・宿泊・買い物に費用を記録。各費用は「<b>金額 + 通貨</b>」(18 種)。</p>
+        <div class="note">・<b>空欄は集計されません</b>。<br>・<b>通貨ごとに別集計、為替換算はしません</b>。</div>
+        <p>「費用一覧」タブは<b>通貨別</b>に交通 / 食事 / 宿泊と小計を表示。<span class="btn">🗂️ 日別</span> / <span class="btn">📄 1ページ</span> 切替可;0 の行と全 0 の通貨は自動非表示。</p>
+      </section>
+
+      <section class="ch" id="ja-c7"><h2 class="chh">7. 持ち物・買い物リスト</h2>
+        <p>操作は共通で、各<b>複数リスト</b>作成可(サブタブ):</p>
+        <table>
+          <tr><th>リスト</th><th>項目</th></tr>
+          <tr><td><b>持ち物リスト</b></td><td>名称、数量、画像。</td></tr>
+          <tr><td><b>買い物リスト</b></td><td>名称、数量、画像、<b>概算費用</b>(集計対象)。</td></tr>
+        </table>
+        <p><span class="btn">＋ リスト追加</span>、<span class="btn">＋</span> 項目追加、<span class="btn d">－</span> 削除。</p>
+      </section>
+
+      <section class="ch" id="ja-c8"><h2 class="chh">8. 日程設定</h2>
+        <p>右下の <span class="btn">🗓️ 日程設定</span> を開き、<b>出発日・日数・順序</b>を調整。</p>
+        <h3 id="ja-c8-1">8.1 基本概念:日付は「位置」に固定</h3>
+        <div class="note red"><b>各日の日付は「何日目か」で決まり、その日自体には紐づきません。</b>順序 / 日数を変えると動くのは「その日の内容」で、1 日目は常に出発日。<b>例</b>:3 日目を 1 日目へ = 元の 3 日目の予定を出発日に行う。</div>
+        <h3 id="ja-c8-2">8.2 パネルの内容</h3>
+        <ul>
+          <li><b>出発日</b>(3 ドロップダウン)、<b>日数</b>(1–60)。</li>
+          <li>各行:N 日目・日付(曜日)・<b>起点 → 終点</b>の要約(似た日を区別しやすい)。</li>
+          <li>下部に変更サマリー。削除対象で内容ありは赤字警告。</li>
+        </ul>
+        <h3 id="ja-c8-3">8.3 並べ替え(即時プレビュー)</h3>
+        <p>▲▼ またはドラッグ <code>⠿</code> でメイン画面に即時反映。日別表示では移動中の日に追従します。</p>
+        <h3 id="ja-c8-4">8.4 日数の増減とプレビュー</h3>
+        <p><b>減らす</b>と超過分は削除ライン下に<b>プレビュー</b>(即削除しない)。適用で削除、内容ありは再確認。適用前は ▲▼ / ドラッグで残す日を<b>ライン上へ「救出」</b>可。<b>増やす</b>と新規空白日をプレビュー。</p>
+        <h3 id="ja-c8-5">8.5 適用とキャンセル</h3>
+        <table>
+          <tr><th>操作</th><th>結果</th></tr>
+          <tr><td><span class="btn">✓ 適用</span></td><td>変更を確定。</td></tr>
+          <tr><td><span class="btn g">キャンセル / ✕ / 外側</span></td><td>変更を破棄し<b>開く前に復元</b>。</td></tr>
+        </table>
+      </section>
+
+      <section class="ch" id="ja-c9"><h2 class="chh">9. 概要と出力</h2>
+        <h3 id="ja-c9-1">9.1 旅程概要</h3>
+        <p><span class="btn">📋 旅程概要</span> でプレビュー(PDF と同一)。上部に出力ボタン。</p>
+        <h3 id="ja-c9-2">9.2 PDF 出力</h3>
+        <ol class="steps">
+          <li><span class="btn">📄 PDF 出力</span> を押します。<b>PDF 添付の中身を印刷するには必ずこのボタンを使用してください</b>。<span class="kbd">Ctrl</span>+<span class="kbd">P</span> の場合、PDF 添付は末尾の一覧表示のみになります。</li>
+          <li>送信先で「<b>PDF に保存</b>」を選択。</li>
+          <li>ファイル名はタイトル。レイアウト確認後に保存。</li>
+        </ol>
+        <p>順序:タイトル → 各日 → 1 ページ費用一覧 → リスト → 画像添付(各 1 ページ)→ <b>PDF 添付の各ページ</b>(1 ページずつ)→ 変換できなかった PDF 添付の一覧。印刷は常にライト。</p>
+        <h3 id="ja-c9-3">9.3 Excel 出力</h3>
+        <p><span class="btn">📊 Excel 出力</span> で <code>.xlsx</code> を生成。シート:行程表 / 食事 / 宿泊 / 費用一覧 + 各リスト;画像埋込、Email / Web はハイパーリンク。</p>
+        <div class="note blue">PDF / Excel は<b>読み戻し不可</b>。再編集には JSON を保存。</div>
+      </section>
+
+      <section class="ch" id="ja-c10"><h2 class="chh">10. 保存と読み込み</h2>
+        <p><b>JSON が唯一の完全復元可能な形式です。</b></p>
+        <table>
+          <tr><th>ボタン</th><th>動作</th></tr>
+          <tr><td><span class="btn">📂 読み込み</span></td><td><code>.json</code> を開いて続行(旧版も自動互換)。</td></tr>
+          <tr><td><span class="btn">💾 保存</span></td><td>この旅程に<b>元ファイル</b>がある(読み込み/名前を付けて保存済み)→ <b>元ファイルに上書き</b>;無ければ「名前を付けて保存」と同じ。</td></tr>
+          <tr><td><span class="btn">📁 名前を付けて保存</span></td><td>場所を選んで新規保存。以後の「保存」はこの新ファイルへ。</td></tr>
+        </table>
+        <div class="tip"><b>元ファイル上書きとフォルダ記憶</b>(Chrome / Edge):読み込み/保存したファイルとフォルダを記憶し、次回のダイアログは<b>前回のフォルダ</b>から開始。ブラウザを閉じても有効。初回の上書き時に<b>書き込み許可</b>を一度尋ねられます。</div>
+        <ul>
+          <li><b>前回の続き</b>:起動時は既定でホーム;過去にファイルを開いていればホームに「<b>↻ 前回の続き</b>」が表示され、押すと<b>「最後に開いた実ファイル」の現在の内容を直接読み込みます</b>(ブラウザの一時保存ではありません)。そのため<b>ファイルが削除・移動されているとエラー</b>になり、古いデータは復元しません。</li>
+          <li><b>自動保存</b>:編集中はブラウザ(localStorage)に最後の 1 回のみ、端末 / ブラウザに紐づく(安全網であり「前回の続き」では使用しません)。</li>
+        </ul>
+        <div class="note red"><b>必ず JSON でバックアップを</b>——ブラウザデータ削除 / 機種変更で自動保存とパス記憶は失われます。</div>
+        <div class="note"><b>権限の確認について</b>:オフラインのファイルは通常そのまま読み書きでき確認は出ませんが、<b>ブラウザを閉じて再起動した後の初回アクセス時に、ブラウザ(Edge/Chrome)が一度だけ確認</b>します(「ファイルの表示/編集を許可しますか」)。これはブラウザのセキュリティ機構で、プログラムからは消せません。<br><b>データの場所</b>:本ツールは常にオフラインで、アップロードや別の場所へのコピーはしません;端末のブラウザに自動保存(localStorage)とファイル参照(IndexedDB)を保持するのみです。<br><b>file://(ダブルクリック)</b>では一部のブラウザ版で上書き / フォルダ記憶が使えず<b>ダウンロード</b>に切替わります。localhost で開くと安定します。Firefox / Safari は非対応でダウンロードになります。</div>
+      </section>
+
+      <section class="ch" id="ja-c11"><h2 class="chh">11. 設定</h2>
+        <table>
+          <tr><th>項目</th><th>選択肢</th></tr>
+          <tr><td><b>テーマ</b></td><td>ライト / ダーク / ソフト(編集画面のみ)。</td></tr>
+          <tr><td><b>既定の通貨</b></td><td>新規費用の既定通貨(18 種)。</td></tr>
+          <tr><td><b>言語</b></td><td>繁体字 / 日本語 / English、即時反映。</td></tr>
+        </table>
+        <p>全体設定として新規に継承;既存旅程はそのファイルの設定を優先。<b>印刷は常にライト</b>;<b>入力データは翻訳されません</b>。</p>
+      </section>
+
+      <section class="ch" id="ja-c12"><h2 class="chh">12. ヒントと FAQ</h2>
+        <table>
+          <tr><th>質問</th><th>回答</th></tr>
+          <tr><td>データは送信される?</td><td>いいえ。完全オフラインで端末内のみ。</td></tr>
+          <tr><td>機種変更で消えた?</td><td>JSON 保存して新端末で読み込みを。</td></tr>
+          <tr><td>費用が計上されない?</td><td>空欄は非計上。金額入力と通貨選択を確認。</td></tr>
+          <tr><td>日数削減を取り消したい?</td><td>適用前ならキャンセルで復元;適用後は JSON から。</td></tr>
+        </table>
+        <div class="note">セキュリティ / アカウント / ネットワークは IT 部門、契約 / 法務は法務窓口へ。コード・設定・コマンドは本番利用前に必ず自己確認を。</div>
+      </section>
+
+      <section class="ch" id="ja-c13"><h2 class="chh">13. 名所参考とおすすめ旅程</h2>
+        <p>日本 47 都道府県・660 か所の名所データを内蔵しています(すべてオフライン、通信なし)。閲覧するだけでなく、そのまま旅程に取り込めます。</p>
+
+        <h3 id="ja-c13-1">13.1 日本の名所</h3>
+        <p>エディター画面の<b>左下「🗾 日本の名所」</b>から開きます。都道府県を選び、カテゴリ(景勝地 / 神社 / 寺院 / 城郭 / 博物館・美術館 / テーマパーク / 温泉 / ランドマークなど)別に閲覧。名称をタップすると<b>住所・電話・ウェブサイト</b>が開きます。データがない項目は「—」と表示されます。</p>
+        <div class="note">これは<b>参考データ</b>で、JSON / PDF / Excel には含まれません。住所と電話は Google マップ基準です。営業時間・休業日は事前にご確認ください。</div>
+
+        <h3 id="ja-c13-2">13.2 名所を旅程へ追加</h3>
+        <p>名所を開くと、名称の右に<b>「設為出發(出発地にする)」「設為抵達(到着地にする)」</b>のボタンが表示されます。</p>
+        <ol>
+          <li>ボタンを押し、追加先の<b>日</b>を選びます(現在のすべての日が一覧に出ます)。</li>
+          <li>その日の既存の予定が要約表示されるので、いずれかを選ぶと<b>出発地</b>または<b>到着地</b>に入ります。</li>
+          <li>または<b>「＋ 予定を追加」</b>で、その日に新しい予定を作って名所を入れます。</li>
+        </ol>
+        <p>反映後すぐ画面が更新され自動保存されます。時刻・メモ・移動区間は通常どおり編集できます。</p>
+
+        <h3 id="ja-c13-3">13.3 おすすめ旅程テンプレート</h3>
+        <p><b>ホームの「🗺️ 旅程のおすすめ」</b>には、人気の 8 方面 × 3 / 5 / 7 日間、計 24 本の定番ルートを用意しています。</p>
+        <table>
+          <tr><th>方面</th><th>エリア</th></tr>
+          <tr><td>東京</td><td>東京・横浜鎌倉・富士山・箱根・日光</td></tr>
+          <tr><td>大阪・京都(関西)</td><td>大阪・京都・奈良・神戸姫路</td></tr>
+          <tr><td>北海道</td><td>札幌小樽・洞爺登別・富良野美瑛・函館</td></tr>
+          <tr><td>沖縄</td><td>那覇・中北部・南部・離島</td></tr>
+          <tr><td>名古屋・北陸(昇龍道)</td><td>名古屋・飛騨高山・白川郷・金沢・立山黒部</td></tr>
+          <tr><td>九州</td><td>福岡・湯布院別府・阿蘇熊本・長崎・高千穂宮崎・鹿児島</td></tr>
+          <tr><td>東北</td><td>仙台松島・山形蔵王銀山・岩手秋田・青森</td></tr>
+          <tr><td>広島・四国(瀬戸内)</td><td>広島宮島・尾道しまなみ・松山・香川・岡山倉敷</td></tr>
+        </table>
+        <p>方面を選んで日数ボタンを押すと、すぐに旅程が作成されエディターに移ります。出発日は<b>本日</b>、旅程名は方面名が初期値で、どちらも後から変更できます。</p>
+        <div class="note"><b>テンプレートは観光スポットのみ</b>で、食事・宿泊は含みません。時刻・交通・費用も空欄です。旅程を開いている場合は上書き確認が出ます——<b>先に保存してから作成してください</b>。</div>
+      </section>
+      <footer>出張旅程プランニングツール ユーザーマニュアル ・ 単一自己完結型 HTML 版</footer>
+    </div>
+
+    <!-- ================= English ================= -->
+    <div class="doc" data-doc="en">
+      <header class="top">
+        <h1>🧭 Business Trip Itinerary Planner — User Manual</h1>
+        <p class="sub">Single self-contained HTML · Works offline · No install · 繁中 / 日本語 / English</p>
+      </header>
+      <div class="note">This tool is a <b>single HTML file</b> (<code>index.html</code>). <b>Double-click to open it offline in any browser.</b> No install, no network, and nothing is uploaded — all your data stays on your own computer.</div>
+
+      <section class="ch" id="en-c1"><h2 class="chh">1. Overview &amp; Features</h2>
+        <p>Plan <b>multi-day</b> business trips / travel. One itinerary records each day's route, transport (multi-leg transfers), meals, hotels, attachments (tickets / booking confirmations), and a per-currency cost summary, plus <b>packing</b> and <b>shopping</b> lists. Export to <b>PDF</b> or <b>Excel</b>.</p>
+        <h3>Design principles</h3>
+        <ul>
+          <li><b>Self-contained &amp; offline</b>: everything in one HTML file; works without internet. The only bundled third-party component is <b>PDF.js</b>, used to rasterise PDF attachments for printing (embedded in this file, local-only, <b>never accesses the network</b>).</li>
+          <li><b>Data stays local</b>: nothing uploaded; edits auto-saved in the browser.</li>
+          <li><b>Trilingual UI</b>: 繁中 / 日本語 / English. Your entered content is never translated.</li>
+        </ul>
+        <h3>The three file roles (important)</h3>
+        <table>
+          <tr><th>Format</th><th>Role</th><th>Re-editable</th></tr>
+          <tr><td><b>JSON</b></td><td>The only save / load format; contains everything incl. embedded attachments</td><td>✔ Fully restorable</td></tr>
+          <tr><td><b>PDF</b></td><td>Output for sharing / printing (via browser print)</td><td>✘ Output only</td></tr>
+          <tr><td><b>Excel</b></td><td>Output for spreadsheets</td><td>✘ Output only</td></tr>
+        </table>
+        <div class="tip"><b>Rule of thumb</b>: to keep editing later, save <b>JSON</b>; to share / print / archive, export <b>PDF</b> or <b>Excel</b>.</div>
+      </section>
+
+      <section class="ch" id="en-c2"><h2 class="chh">2. Getting Started</h2>
+        <h3>2.1 Open the tool</h3>
+        <p><b>Double-click <code>index.html</code></b> to open in your default browser (Chrome / Edge recommended). Starts in Traditional Chinese; change it in Settings.</p>
+        <h3>2.2 Home screen</h3>
+        <p>Titled “<b>Itinerary Planner</b>”, with three entry points:</p>
+        <table>
+          <tr><th>Item</th><th>Description</th></tr>
+          <tr><td><span class="btn">New Itinerary</span></td><td>Create a new itinerary (Ch. 3).</td></tr>
+          <tr><td><span class="btn g">Load</span></td><td>Open a saved <code>.json</code> to continue (Ch. 10).</td></tr>
+          <tr><td><span class="btn g">↻ Resume Last</span></td><td>Shown only when a previous itinerary exists; restores it to continue (Ch. 10).</td></tr>
+          <tr><td><span class="btn g">⚙️ Settings</span></td><td>Theme / currency / language; always in the top bar (Ch. 11).</td></tr>
+        </table>
+        <div class="tip"><b>Tip</b>: language / theme / currency are “global preferences”, remembered and inherited by new itineraries.</div>
+      </section>
+
+      <section class="ch" id="en-c3"><h2 class="chh">3. Creating an Itinerary</h2>
+        <p>Click “New Itinerary” and fill in:</p>
+        <ol class="steps">
+          <li><b>Start date</b>: pick via year / month / day dropdowns. Each day's date is derived from its position.</li>
+          <li><b>Total days</b>: 1–60; adjustable later in Day Setup (Ch. 8).</li>
+          <li><b>Itinerary name</b>: e.g. “Central Supplier Audit”; combined with the start date to form the title / filename.</li>
+          <li>Check the previewed title (<code>yyyymmddName</code>) and click <span class="btn">Create</span>.</li>
+        </ol>
+      </section>
+
+      <section class="ch" id="en-c4"><h2 class="chh">4. Editor Tour</h2>
+        <h3>4.1 The four tabs</h3>
+        <table>
+          <tr><th>Tab</th><th>Purpose</th></tr>
+          <tr><td><b>Itinerary</b></td><td>Edit activities, transport, meals, hotels, attachments per day (Ch. 5).</td></tr>
+          <tr><td><b>Cost Overview</b></td><td>Per-currency cost summary (Ch. 6).</td></tr>
+          <tr><td><b>Packing / Shopping</b></td><td>Item and shopping lists (Ch. 7).</td></tr>
+        </table>
+        <h3>4.2 Title</h3>
+        <p>The title is editable; if left as-is it defaults to “<code>yyyymmddName</code> + day suffix”. Used in PDF / Excel content and the export filename.</p>
+        <h3>4.3 Display modes</h3>
+        <p>“Itinerary” and “Cost Overview” each have <span class="btn">🗂️ By Day</span> / <span class="btn">📄 Single Page</span>. Affects viewing only, not output.</p>
+        <h3 id="en-c4-4">4.4 Bottom-right floating buttons</h3>
+        <p>While editing an itinerary, two floating buttons are always available at the <b>bottom-right</b> (stacked bottom-to-top):</p>
+        <table>
+          <tr><th>Button</th><th>Function</th></tr>
+          <tr><td><span class="btn">🗓️ Day Setup</span></td><td>Adjust start date, total days, day order (Ch. 8).</td></tr>
+          <tr><td><span class="btn">📋 Overview</span></td><td>Open the full preview and export PDF / Excel (Ch. 9).</td></tr>
+        </table>
+        <div class="tip"><b>Drag to reorder</b>: available in two places via the <code>⠿</code> handle — <b>activities</b> within a day (5.3) and <b>days</b> in the Day Setup panel (8.3). Both also support the <span class="btn">▲</span> <span class="btn">▼</span> buttons.</div>
+      </section>
+
+      <section class="ch" id="en-c5"><h2 class="chh">5. Editing the Itinerary</h2>
+        <p>Each day has four blocks: <b>Activities</b>, <b>Meals</b>, <b>Hotels</b>, <b>Attachments</b>.</p>
+        <h3 id="en-c5-1">5.1 Activities &amp; destination</h3>
+        <p>Click <span class="btn">＋ Add Activity</span>. Fields:</p>
+        <table>
+          <tr><th>Field</th><th>Description</th></tr>
+          <tr><td><b>Destination</b></td><td>Main heading (optional); <b>if blank, the “arrival location” is used</b>.</td></tr>
+          <tr><td><b>Departure location / time</b></td><td>Start point and time (24-hour; tap to pick).</td></tr>
+          <tr><td><b>Arrival location / time</b></td><td>End point and time.</td></tr>
+          <tr><td><b>Leg (transport)</b></td><td>Transport for this segment (5.2).</td></tr>
+          <tr><td><b>Note</b></td><td>Any remarks.</td></tr>
+        </table>
+        <div class="eg"><span class="lbl">EXAMPLE</span><br>Destination: Taichung HSR　·　Kaohsiung 06:55 → Taichung HSR 10:55</div>
+        <div class="tip"><b>🗺️ Map (online edition only)</b>: the <span class="btn">🗺️</span> next to "Activity N" <b>expands a Google map inside the card</b> showing the <b>route from the departure place to the arrival place</b> (if the arrival place is empty it falls back to Destination; if only one is filled it shows that single place). Below the map, <b>"Open in Google Maps ↗"</b> opens the full map in a new tab.<br>
+          · <b>One full route map per day</b>: each day header has a <span class="btn">🗺️ Day route</span> button on the right that chains every activity of that day into a <b>single multi-stop route</b>. If the next activity departs from where the previous one arrived, that place <b>counts once</b> (A→B, B→C gives <b>A→B→C</b>); if it departs from somewhere else, both places are kept (A→B, B'→C gives <b>A→B→B'→C</b>).<br>
+          · Two limits apply: <b>transit does not support waypoints</b> (with stops in between the route falls back to driving — use a single activity's map for transit), and there is a <b>maximum of 9 waypoints</b> (extra middle stops are dropped and the count is stated below the map; the start and end are always kept).<br>
+          · Above the map are four <b>travel modes</b>: <b>🚗 Drive / 🚆 Transit / 🚶 Walk / 🚲 Bike</b>. Picking one reloads the map in that mode and remembers your choice for the next activity you expand.<br>
+          · <b>For alternative routes (e.g. Ginza line vs JR), use "Open in Google Maps ↗"</b> — it carries your selected mode over, and the Google Maps page lists each route with its duration and transfers. The in-card map only draws a single route; that is a limitation of embedded maps.<br>
+          · <b>Only one map is open at a time</b> — expanding another collapses the previous one; press <span class="btn">🗺️</span> again to collapse.<br>
+          · After editing the place fields, <b>collapse and expand again</b> to reload with the new places.<br>
+          · The map <b>requires an internet connection</b> (loaded from Google the moment you expand it) and never appears in PDF / Excel output. If outbound connections are not allowed in your environment, use the <b>offline edition</b> in <code>offline/</code> — it has no map feature and contains no networking code at all.</div>
+        <h3 id="en-c5-2">5.2 Legs &amp; transports</h3>
+        <p>A “leg” can contain <b>multiple “transports”</b> to describe transfers. Each transport: mode / vehicle name, from → to, depart / arrive time, <b>duration</b>, cost.</p>
+        <div class="eg"><span class="lbl">TRANSFER</span><br>Transport 1: HSR (Kaohsiung→Taichung) 08:00–09:00　·　Transport 2: Taxi (station→hotel) 09:10–09:30</div>
+        <div class="tip"><b>Duration</b>: when a transport's <b>start/end times are uncertain</b>, you can fill only the “duration” (minutes, up to 3 digits; excluded from time checks). In output: if both times are set, times are used; <b>if one is missing or both are blank, a colored “Travel xx min” badge is shown after the route</b>; Excel has a “Duration” column showing “xx min”.</div>
+        <h3 id="en-c5-3">5.3 Reordering activities</h3>
+        <ul>
+          <li><b>▲ / ▼ buttons</b>: swap with the neighbor (mobile / desktop).</li>
+          <li><b>Drag (desktop)</b>: grab the <code>⠿</code> handle in the title row; auto-scrolls near window edges; same-day only.</li>
+        </ul>
+        <h3 id="en-c5-4">5.4 Meals</h3>
+        <p><span class="btn">＋ Add Meal</span>. Fields: name, address, phone, fax, email, website, dining time, reserved / reservation time, estimated cost.</p>
+        <h3 id="en-c5-5">5.5 Hotels</h3>
+        <p><span class="btn">＋ Add Hotel</span>. Fields: name, address, phone, fax, email, website, check-in / out, cost.</p>
+        <h3 id="en-c5-6">5.6 Attachments</h3>
+        <p><span class="btn">＋ Import Attachment</span> for <b>images</b> or <b>PDF</b>. Attachments are <b>embedded in the itinerary file</b> and travel with the JSON.</p>
+        <div class="note blue">In output: <b>images</b> get one page each in PDF / embedded in Excel; <b>PDF attachments</b> are <b>rasterised page by page</b> and printed after the image attachments (one page each), so the itinerary and all vouchers print together.</div>
+        <div class="note">・Conversion runs when you click <span class="btn">📄 Export PDF</span> or <span class="btn">📋 Overview</span>; with many attachments it takes a moment and a progress message is shown.<br>・Each PDF attachment converts <b>up to 30 pages</b>; anything beyond that is <b>explicitly reported as omitted</b> on that attachment's last page — never silently truncated.<br>・A few PDFs (e.g. encrypted) can't be converted; those <b>fall back to the list on the last page</b>, and the original can still be opened in the tool.</div>
+        <h3 id="en-c5-7">5.7 Time checks</h3>
+        <p>Inconsistent times trigger <b>live red warnings</b> (departures must increase, arrival not before departure, transports within range). <b>Editor only — not in output</b>; blanks are skipped.</p>
+      </section>
+
+      <section class="ch" id="en-c6"><h2 class="chh">6. Costs &amp; Overview</h2>
+        <p>Transport, meals, hotels and shopping can hold costs. Each cost is “<b>amount + currency</b>” (18 currencies).</p>
+        <div class="note">・<b>Blank amounts are not counted.</b><br>・<b>Currencies are totaled separately; no exchange conversion.</b></div>
+        <p>The “Cost Overview” tab groups <b>by currency</b> into transport / meals / hotels with subtotals. Toggle <span class="btn">🗂️ By Day</span> / <span class="btn">📄 Single Page</span>; zero rows and all-zero currencies are hidden.</p>
+      </section>
+
+      <section class="ch" id="en-c7"><h2 class="chh">7. Packing &amp; Shopping Lists</h2>
+        <p>Both work the same and support <b>multiple lists</b> each (sub-tabs):</p>
+        <table>
+          <tr><th>List</th><th>Item fields</th></tr>
+          <tr><td><b>Packing</b></td><td>name, quantity, small image.</td></tr>
+          <tr><td><b>Shopping</b></td><td>name, quantity, image, <b>estimated cost</b> (counted).</td></tr>
+        </table>
+        <p><span class="btn">＋ Add List</span>, <span class="btn">＋</span> add item, <span class="btn d">－</span> delete.</p>
+      </section>
+
+      <section class="ch" id="en-c8"><h2 class="chh">8. Day Setup</h2>
+        <p>Open <span class="btn">🗓️ Day Setup</span> (bottom-right) to adjust <b>start date, total days, and day order</b>.</p>
+        <h3 id="en-c8-1">8.1 Key concept: dates are bound to position</h3>
+        <div class="note red"><b>Each day's date comes from its position, not from the day itself.</b> Reordering / resizing moves “that day's content”; Day 1 is always the start date. <b>Example</b>: moving Day 3 to Day 1 = do Day 3's plan on the start date.</div>
+        <h3 id="en-c8-2">8.2 Panel contents</h3>
+        <ul>
+          <li><b>Start date</b> (3 dropdowns), <b>total days</b> (1–60).</li>
+          <li>Each row: Day N · date (weekday) · <b>start → end</b> route (to tell similar days apart).</li>
+          <li>A change summary at the bottom; days to be deleted that contain content are flagged in red.</li>
+        </ul>
+        <h3 id="en-c8-3">8.3 Reordering (live preview)</h3>
+        <p>▲▼ or drag <code>⠿</code>; the main screen updates live. In By-Day mode it keeps following the day you move.</p>
+        <h3 id="en-c8-4">8.4 Add / remove days &amp; preview</h3>
+        <p><b>Reducing</b> days previews the extras below a delete line (not deleted yet); Apply deletes them (with a confirm if they contain content). Before applying, use ▲▼ / drag to <b>rescue</b> days above the line. <b>Increasing</b> previews new blank days.</p>
+        <h3 id="en-c8-5">8.5 Apply &amp; cancel</h3>
+        <table>
+          <tr><th>Action</th><th>Result</th></tr>
+          <tr><td><span class="btn">✓ Apply</span></td><td>Commit the changes.</td></tr>
+          <tr><td><span class="btn g">Cancel / ✕ / outside</span></td><td>Discard changes and <b>revert to before opening</b>.</td></tr>
+        </table>
+      </section>
+
+      <section class="ch" id="en-c9"><h2 class="chh">9. Overview &amp; Export</h2>
+        <h3 id="en-c9-1">9.1 Itinerary overview</h3>
+        <p><span class="btn">📋 Overview</span> shows a full preview (identical to the PDF) with export buttons on top.</p>
+        <h3 id="en-c9-2">9.2 Export PDF</h3>
+        <ol class="steps">
+          <li>Click <span class="btn">📄 Export PDF</span>. <b>Use this button to print the contents of PDF attachments</b>; pressing <span class="kbd">Ctrl</span>+<span class="kbd">P</span> alone falls back to listing them on the last page.</li>
+          <li>Choose “<b>Save as PDF</b>” as the destination.</li>
+          <li>The filename defaults to the title; check layout and save.</li>
+        </ol>
+        <p>Order: title → each day → one-page cost summary → lists → image attachments (one per page) → <b>the pages of each PDF attachment</b> (one per page) → a list of PDF attachments that could not be converted. Printing is always light.</p>
+        <h3 id="en-c9-3">9.3 Export Excel</h3>
+        <p><span class="btn">📊 Export Excel</span> produces a real <code>.xlsx</code>. Sheets: itinerary / meals / hotels / cost overview + each list; images embedded, email / website as hyperlinks.</p>
+        <div class="note blue">PDF / Excel <b>can't be loaded back</b>. To keep editing, save JSON.</div>
+      </section>
+
+      <section class="ch" id="en-c10"><h2 class="chh">10. Save &amp; Load</h2>
+        <p><b>JSON is the only fully restorable format.</b></p>
+        <table>
+          <tr><th>Button</th><th>Behavior</th></tr>
+          <tr><td><span class="btn">📂 Load</span></td><td>Open a <code>.json</code> to continue (older files auto-migrate).</td></tr>
+          <tr><td><span class="btn">💾 Save</span></td><td>If this itinerary has a <b>source file</b> (loaded or saved-as) → <b>writes back to the original</b>; otherwise same as Save As.</td></tr>
+          <tr><td><span class="btn">📁 Save As</span></td><td>Pick a location for a new file; later “Save” writes to this new file.</td></tr>
+        </table>
+        <div class="tip"><b>Overwrite original &amp; folder memory</b> (Chrome / Edge): the file and its folder are remembered, so the next load/save dialog <b>starts in the last folder</b> — persists across browser restarts. The first overwrite asks for <b>write permission</b> once.</div>
+        <ul>
+          <li><b>Resume last</b>: startup returns to Home by default; if you've opened a file before, Home shows “<b>↻ Resume Last</b>” — it <b>reads the current content of the last opened file directly</b> (not the browser cache). So if that file was <b>deleted / moved it errors</b> and won't bring back stale data.</li>
+          <li><b>Auto-save</b>: kept in the browser (localStorage), last state only, tied to that browser (a safety net; not used by Resume Last).</li>
+        </ul>
+        <div class="note red"><b>Always keep your own JSON backups</b> — clearing browser data / switching device or browser loses the auto-save and the remembered path.</div>
+        <div class="note"><b>About the permission prompt</b>: offline files usually read/write directly with no prompt, but <b>the first file access after restarting the browser triggers a one-time native confirmation</b> from the browser (Edge/Chrome) — a security mechanism that the app cannot remove. <b>Data location</b>: the tool is fully offline; nothing is uploaded or copied elsewhere — only the auto-save (localStorage) and a file reference (IndexedDB) are kept in your local browser. <b>file:// (double-click)</b>: some browser versions fall back to <b>download</b> (no overwrite / folder memory); open via localhost for reliability. Firefox / Safari don't support this and always download.</div>
+      </section>
+
+      <section class="ch" id="en-c11"><h2 class="chh">11. Settings</h2>
+        <table>
+          <tr><th>Item</th><th>Options</th></tr>
+          <tr><td><b>Theme</b></td><td>Light / Dark / Soft (editor only).</td></tr>
+          <tr><td><b>Default currency</b></td><td>Default for new costs (18).</td></tr>
+          <tr><td><b>Language</b></td><td>繁中 / 日本語 / English, applied instantly.</td></tr>
+        </table>
+        <p>These are global preferences inherited by new itineraries; existing itineraries use their own saved settings. <b>Printing is always light</b>; <b>your entered data is never translated</b>.</p>
+      </section>
+
+      <section class="ch" id="en-c12"><h2 class="chh">12. Tips &amp; FAQ</h2>
+        <table>
+          <tr><th>Question</th><th>Answer</th></tr>
+          <tr><td>Is my data uploaded?</td><td>No. Fully offline; data stays on your device.</td></tr>
+          <tr><td>Lost after switching PC?</td><td>Save JSON, move it, then Load on the new PC.</td></tr>
+          <tr><td>A cost isn't counted?</td><td>Blank amounts don't count; enter the amount and pick a currency.</td></tr>
+          <tr><td>Undo a day reduction?</td><td>Cancel before Apply to revert; after Apply, load a JSON backup.</td></tr>
+        </table>
+        <div class="note">For security / account / network issues contact IT; for contracts / legal contact the legal desk. Review code, config and commands yourself before production use.</div>
+      </section>
+
+      <section class="ch" id="en-c13"><h2 class="chh">13. Spots &amp; Suggested Plans</h2>
+        <p>The tool ships with reference data for 660 spots across all 47 Japanese prefectures — fully offline, no network access.</p>
+
+        <h3 id="en-c13-1">13.1 Japan Spots</h3>
+        <p>Open it from the <b>🗾 Japan Spots</b> button at the bottom left of the editor. Pick a prefecture, then browse by category (scenery / shrines / temples / castles / museums / theme parks / hot springs / landmarks). Tap a spot name to reveal its <b>address, phone and website</b>; missing fields show “—”.</p>
+        <div class="note">This is <b>reference data only</b> — it never enters your JSON, PDF or Excel. Addresses and phone numbers follow Google Maps; always re-check opening hours and closing days before you travel.</div>
+
+        <h3 id="en-c13-2">13.2 Adding a spot to the itinerary</h3>
+        <p>With a spot expanded, two buttons appear next to its name — <b>set as departure</b> and <b>set as arrival</b>:</p>
+        <ol>
+          <li>Pick the <b>day</b> to add it to (the dropdown lists every day of the current itinerary).</li>
+          <li>The existing activities of that day are summarised; click one to fill its <b>departure</b> or <b>arrival</b> place.</li>
+          <li>Or use <b>“＋ Add activity”</b> to create a new activity on that day with the spot already filled in.</li>
+        </ol>
+        <p>The editor updates and auto-saves immediately; times, notes and legs stay fully editable afterwards.</p>
+
+        <h3 id="en-c13-3">13.3 Suggested plan templates</h3>
+        <p><b>🗺️ Suggested Plans</b> on the home screen offers 8 popular destinations × 3 / 5 / 7 days — 24 templates based on classic guided-tour routes.</p>
+        <table>
+          <tr><th>Destination</th><th>Covers</th></tr>
+          <tr><td>Tokyo</td><td>Tokyo, Yokohama &amp; Kamakura, Mt. Fuji, Hakone, Nikko</td></tr>
+          <tr><td>Osaka &amp; Kyoto (Kansai)</td><td>Osaka, Kyoto, Nara, Kobe &amp; Himeji</td></tr>
+          <tr><td>Hokkaido</td><td>Sapporo, Otaru, Toya &amp; Noboribetsu, Furano, Hakodate</td></tr>
+          <tr><td>Okinawa</td><td>Naha, north &amp; central, south, outer islands</td></tr>
+          <tr><td>Nagoya &amp; Hokuriku (Dragon Route)</td><td>Nagoya, Takayama, Shirakawa-go, Kanazawa, Tateyama</td></tr>
+          <tr><td>Kyushu</td><td>Fukuoka, Yufuin &amp; Beppu, Aso &amp; Kumamoto, Nagasaki, Takachiho, Kagoshima</td></tr>
+          <tr><td>Tohoku</td><td>Sendai, Yamagata, Zao &amp; Ginzan, Iwate &amp; Akita, Aomori</td></tr>
+          <tr><td>Hiroshima &amp; Shikoku (Setouchi)</td><td>Hiroshima, Onomichi, Matsuyama, Kagawa, Okayama</td></tr>
+        </table>
+        <p>Choose a destination and click a length — the itinerary is created and the editor opens. The start date defaults to <b>today</b> and the name to the destination; both can be changed.</p>
+        <div class="note"><b>Templates cover sightseeing only</b> — no meals or hotels, and times, transport and costs are left blank. If an itinerary is already open you are asked before it is overwritten; <b>save your work first</b>.</div>
+      </section>
+      <footer>Business Trip Itinerary Planner — User Manual · Single self-contained HTML</footer>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  var _spy = null;
+  function initSpy(){
+    if (_spy){ _spy.disconnect(); _spy = null; }
+    var lang = document.documentElement.getAttribute('data-doclang');
+    var scope = document.querySelector('.sidebar div[data-doc="' + lang + '"]');
+    var docBlk = document.querySelector('.content div[data-doc="' + lang + '"]');
+    if (!scope || !docBlk){ return; }
+    var links = Array.prototype.slice.call(scope.querySelectorAll('a'));
+    var map = {}; links.forEach(function(a){ var id = a.getAttribute('href').slice(1); if (id) map[id] = a; });
+    var targets = Array.prototype.slice.call(docBlk.querySelectorAll('section.ch'));
+    var current = null;
+    function setActive(a){ if (a === current) return; if (current) current.classList.remove('active'); if (a) a.classList.add('active'); current = a; }
+    _spy = new IntersectionObserver(function(entries){
+      var vis = entries.filter(function(e){ return e.isIntersecting; });
+      if (vis.length){ vis.sort(function(x,y){ return x.boundingClientRect.top - y.boundingClientRect.top; }); var id = vis[0].target.id; if (map[id]) setActive(map[id]); }
+    }, { rootMargin: '0px 0px -70% 0px', threshold: 0 });
+    targets.forEach(function(t){ _spy.observe(t); });
+  }
+  function setDocLang(l){
+    document.documentElement.setAttribute('data-doclang', l);
+    document.documentElement.setAttribute('lang', l === 'zh' ? 'zh-Hant' : l);
+    var btns = document.querySelectorAll('.langsw button');
+    for (var i = 0; i < btns.length; i++){ btns[i].classList.toggle('on', btns[i].getAttribute('data-set') === l); }
+    try { localStorage.setItem('manualLang', l); } catch (e){}
+    window.scrollTo(0, 0);
+    initSpy();
+  }
+  (function(){
+    var saved = 'zh';
+    try { saved = localStorage.getItem('manualLang') || 'zh'; } catch (e){}
+    setDocLang(saved);
+  })();
+</script>
+</body>
+</html>
