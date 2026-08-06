@@ -78,9 +78,8 @@
   /* 原本寫在 HTML 的 inline style;移到這裡才能在窄螢幕以媒體查詢覆寫間距
      (.hidden 用的是 !important,顯示/隱藏的切換不受影響) */
   #editorTools { display: flex; gap: 10px; }
-  /* data-i18n-split 產生的圖示/文字兩段;此處還原原本「圖示 空格 文字」的間距。
-     不限定 .appbar:總覽彈窗的標題列按鈕也用同一套機制。 */
-  .bl { margin-left: 5px; }
+  /* data-i18n-split 產生的圖示/文字兩段。間距由 .bl 內保留的半形空格提供,
+     不用 margin —— 見 setSplitLabel() 的說明(margin 會讓渲染寬超出量測基準)。 */
 
   main { max-width: 1000px; margin: 0 auto; padding: 24px 20px 80px; }
 
@@ -1477,7 +1476,10 @@ function setSplitLabel(el, s){
   el.appendChild(ic);
   if (p > 0){
     var lb = document.createElement("span"); lb.className = "bl";
-    lb.textContent = s.slice(p + 1);
+    // 保留原本那個半形空格(放在 .bl 內,隱藏文字時會一起消失)。
+    // 若改用 CSS margin 代替,渲染寬會比 fixBtnWidth 以純文字量到的基準多 1~2px,
+    // 逐日/一頁切換鈕的固定寬就會不足、把文字擠出框。
+    lb.textContent = s.slice(p);
     el.appendChild(lb);
   }
   el.setAttribute("aria-label", s);                                  // 只剩圖示時仍可辨識
