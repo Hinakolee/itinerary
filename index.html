@@ -364,6 +364,9 @@
   .editor-content { flex: 1; min-width: 0; }
   .itin-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
   .itin-head #itinModeBtn { flex-shrink: 0; white-space: nowrap; }
+  /* fixBtnWidth() 量出「各狀態 × 各語言」最寬值後掛上的固定寬(以 CSS 變數傳入,
+     不用 inline width,窄螢幕的方形圖示鈕才蓋得掉) */
+  .fixw { width: var(--fix-w, auto); }
 
   /* 左側父頁籤(垂直文字) */
   .tab-bar {
@@ -782,7 +785,7 @@
        以 [data-i18n-split] 為開關:工具列與總覽彈窗標題列共用同一套規則,
        日後任何按鈕要在窄螢幕只留圖示,加上該屬性即可,不必再寫 CSS。 */
     .appbar button,
-    .modal-head button[data-i18n-split] {
+    button[data-i18n-split] {
                      flex: 0 0 auto; white-space: nowrap;
                      width: 38px; height: 38px; padding: 0;
                      display: inline-flex; align-items: center; justify-content: center; }
@@ -800,11 +803,12 @@
     .ptab-label { writing-mode: horizontal-tb; text-orientation: mixed;
                   letter-spacing: normal; font-size: 13px; line-height: 1.2; text-align: center; }
 
-    /* 標題列:標題與「顯示方式」鈕分行。
-       .itin-head 的第一層 div 沒有 min-width:0,24px 字級 input 的固有寬度
+    /* 標題列:「行程/花費 逐日‧一頁」切換鈕縮成正方形圖示,與標題同一列靠右,
+       不再各佔一行(方形尺寸由上面的 button[data-i18n-split] 規則提供)。
+       .itin-head 的第一層 div 必須有 min-width:0,否則 24px 字級 input 的固有寬度
        會把整列撐到 601px(視窗僅 376px)→ 產生全頁水平捲動。 */
-    .itin-head { flex-wrap: wrap; gap: 8px; }
-    .itin-head > div { flex: 1 1 100%; min-width: 0; }
+    .itin-head { gap: 8px; align-items: center; }
+    .itin-head > div { min-width: 0; }
     .editor-title-input { font-size: 20px; }
 
     /* 行程欄位改單欄,否則出發地/抵達地輸入框只剩幾個字元寬。
@@ -899,7 +903,7 @@
   @media (max-width: 560px) {
     main { padding: 16px 12px 150px; }
     .appbar button,
-    .modal-head button[data-i18n-split] { width: 34px; height: 34px; }
+    button[data-i18n-split] { width: 34px; height: 34px; }
     [data-i18n-split] .bi { font-size: 16px; }
     /* 375/376px(iPhone SE~X 等常見寬度)時品名只差 1px 就完整,會斷成「行程規劃工…」。
        右內距與圖示間距各再收一點,共補回 6px,讓這些寬度能完整顯示品名。
@@ -997,7 +1001,7 @@
             </div>
             <p class="editor-meta" id="edMeta"></p>
           </div>
-          <button id="itinModeBtn" onclick="toggleItinMode()" data-i18n-title="tipItinMode" title="切換行程顯示方式">🗂️ 行程逐日顯示</button>
+          <button id="itinModeBtn" data-i18n-split onclick="toggleItinMode()" data-i18n-title="tipItinMode" title="切換行程顯示方式">🗂️ 行程逐日顯示</button>
         </div>
         <div id="itinSubTabBar" class="subtab-bar no-print hidden"></div>
         <div id="daysContainer"></div>
@@ -1015,7 +1019,7 @@
           <div>
             <h1 class="editor-title" data-i18n="expenseTitle">💰 花費總覽</h1>
           </div>
-          <button id="expenseModeBtn" onclick="toggleExpenseMode()" data-i18n-title="tipExpMode" title="切換花費顯示方式">🗂️ 花費逐日顯示</button>
+          <button id="expenseModeBtn" data-i18n-split onclick="toggleExpenseMode()" data-i18n-title="tipExpMode" title="切換花費顯示方式">🗂️ 花費逐日顯示</button>
         </div>
         <div id="expenseSubTabBar" class="subtab-bar no-print hidden"></div>
         <div id="expenseBody"></div>
@@ -1460,27 +1464,30 @@ function curName(code){
   if (L !== "zh-Hant" && CUR_L10N[L] && CUR_L10N[L][code]){ return CUR_L10N[L][code]; }
   var c = getCurrency(code); return c ? c.name : code;
 }
+/* 把「圖示 + 半形空格 + 文字」拆成 .bi / .bl 兩個 span,窄螢幕只留 .bi(見 RWD 區塊)。
+   三語的工具列 / 彈窗標題列字串一律是 emoji 或符號 + 半形空格 + 文字。
+   標記 data-i18n-split 的元素由 applyStaticI18n 套用;文字會動態切換的按鈕
+   (行程 / 花費的逐日‧一頁切換)則由各自的 update 函式呼叫,故抽成共用函式。
+   已有 data-i18n-title 的元素保留原本的提示,不覆蓋。 */
+function setSplitLabel(el, s){
+  var p = s.indexOf(" ");
+  el.textContent = "";
+  var ic = document.createElement("span"); ic.className = "bi";
+  ic.textContent = p > 0 ? s.slice(0, p) : s;
+  el.appendChild(ic);
+  if (p > 0){
+    var lb = document.createElement("span"); lb.className = "bl";
+    lb.textContent = s.slice(p + 1);
+    el.appendChild(lb);
+  }
+  el.setAttribute("aria-label", s);                                  // 只剩圖示時仍可辨識
+  if (!el.hasAttribute("data-i18n-title")){ el.setAttribute("title", s); }
+}
 function applyStaticI18n(){
   var qa = function(sel){ return Array.prototype.slice.call(document.querySelectorAll(sel)); };
   qa("[data-i18n]").forEach(function(el){
     var s = t(el.getAttribute("data-i18n"));
-    // data-i18n-split:把「圖示 + 空格 + 文字」拆成兩個 span,窄螢幕可只留圖示
-    // (三語的工具列字串一律是 emoji/箭號 + 半形空格 + 文字)
-    if (el.hasAttribute("data-i18n-split")){
-      var p = s.indexOf(" ");
-      el.textContent = "";
-      var ic = document.createElement("span"); ic.className = "bi";
-      ic.textContent = p > 0 ? s.slice(0, p) : s;
-      el.appendChild(ic);
-      if (p > 0){
-        var lb = document.createElement("span"); lb.className = "bl";
-        lb.textContent = s.slice(p + 1);
-        el.appendChild(lb);
-      }
-      el.setAttribute("aria-label", s);                                  // 只剩圖示時仍可辨識
-      if (!el.hasAttribute("data-i18n-title")){ el.setAttribute("title", s); }
-      return;
-    }
+    if (el.hasAttribute("data-i18n-split")){ setSplitLabel(el, s); return; }
     el.textContent = s;
   });
   qa("[data-i18n-ph]").forEach(function(el){ el.setAttribute("placeholder", t(el.getAttribute("data-i18n-ph"))); });
@@ -2408,7 +2415,7 @@ function updateItinModeBtn(){
   var b = $("itinModeBtn");
   if (!b){ return; }
   // 顯示「將切換到的動作」
-  b.textContent = (state && state.itinMode === "byday") ? t("itinModeToSingle") : t("itinModeToByday");
+  setSplitLabel(b, (state && state.itinMode === "byday") ? t("itinModeToSingle") : t("itinModeToByday"));
 }
 function toggleItinMode(){
   if (!state){ return; }
@@ -2434,7 +2441,7 @@ function updateExpenseModeBtn(){
   var b = $("expenseModeBtn");
   if (!b){ return; }
   // 顯示「將切換到的動作」
-  b.textContent = (state && state.expenseMode === "byday") ? t("expModeToSingle") : t("expModeToByday");
+  setSplitLabel(b, (state && state.expenseMode === "byday") ? t("expModeToSingle") : t("expModeToByday"));
 }
 function toggleExpenseMode(){
   if (!state){ return; }
@@ -5561,7 +5568,9 @@ function fixBtnWidth(btn, keys){
     }
   }
   document.body.removeChild(probe);
-  if (max > 0){ btn.style.width = max + "px"; }
+  // 用 class + CSS 變數而非 inline width:inline style 會贏過媒體查詢,
+  // 窄螢幕要把這兩顆改成正方形圖示鈕就蓋不掉了。
+  if (max > 0){ btn.style.setProperty("--fix-w", max + "px"); btn.classList.add("fixw"); }
 }
 
 /* ---------- 日期框架面板(右下角浮動鈕開啟;出發日 / 天數 / 順序) ----------
