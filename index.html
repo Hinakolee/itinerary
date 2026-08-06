@@ -75,6 +75,12 @@
   }
   header.appbar .brand { font-weight: 700; font-size: 16px; }
   header.appbar .spacer { flex: 1; }
+  /* 原本寫在 HTML 的 inline style;移到這裡才能在窄螢幕以媒體查詢覆寫間距
+     (.hidden 用的是 !important,顯示/隱藏的切換不受影響) */
+  #editorTools { display: flex; gap: 10px; }
+  /* data-i18n-split 產生的圖示/文字兩段;此處還原原本「圖示 空格 文字」的間距。
+     不限定 .appbar:總覽彈窗的標題列按鈕也用同一套機制。 */
+  .bl { margin-left: 5px; }
 
   main { max-width: 1000px; margin: 0 auto; padding: 24px 20px 80px; }
 
@@ -162,8 +168,12 @@
   .editor-title-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.12); background: var(--panel); }
   /* 行程主題(activity 標題列) */
   .act-title-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-  /* 地圖鈕:展開/收合卡片內的 Google 地圖(連網版專屬) */
-  .map-btn { flex: 0 0 auto; font-size: 13px; line-height: 1; padding: 5px 8px; border: 1px solid var(--border);
+  /* 地圖鈕:展開/收合卡片內的 Google 地圖(連網版專屬)。
+     行程卡片與日期列兩處都是純圖示,長方形不方正 → 一律正方形,並與行程標題輸入框同高。
+     完整說明仍在 title;純圖示按鈕另以 aria-label 標示用途。 */
+  .map-btn { flex: 0 0 auto; width: 28px; height: 28px; padding: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 14px; line-height: 1; border: 1px solid var(--border);
     background: var(--panel); color: var(--muted); border-radius: 6px; cursor: pointer; }
   .map-btn:hover { border-color: var(--accent); color: var(--accent); }
   .map-btn.on { border-color: var(--accent); color: var(--accent); background: var(--chip); }
@@ -183,10 +193,11 @@
   .act-map-mode:hover { border-color: var(--accent); color: var(--accent); }
   .act-map-mode.on { border-color: var(--accent); color: var(--accent); background: var(--chip); font-weight: 700; }
   .act-map-note { padding: 0 10px 8px; font-size: 11px; color: var(--muted); line-height: 1.6; }
-  .day-head .map-btn { font-size: 12px; padding: 4px 10px; }
+  /* 日期列的地圖鈕同樣是正方形(尺寸沿用 .map-btn),不再另設 padding */
   .day-block > .act-map { margin: 0 0 10px; }
   .act-title-input {
-    flex: 1; min-width: 0; font-size: 16px; font-weight: 700; color: var(--text);
+    flex: 1; min-width: 0; min-height: 28px;   /* 與同列的方形地圖鈕等高 */
+    font-size: 16px; font-weight: 700; color: var(--text);
     background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 3px 7px;
   }
   .act-title-input::placeholder { font-weight: 400; color: var(--muted); }
@@ -268,7 +279,11 @@
   .leg input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
   .leg input[type=time] { width: 120px; }
   .leg .cost { width: 100px; }
-  .leg .del-leg { margin-bottom: 1px; }
+  /* 刪除鈕:純圖示 → 正方形,且與同列輸入框(34px)等高,不再是 40.6×28 的長方形。
+     flex: 0 0 auto 是必要的:桌機的 .leg 是 nowrap flex,欄位一多就會壓縮子項,
+     不鎖住的話正方形會被壓成 29×34。 */
+  .leg .del-leg { flex: 0 0 auto; width: 34px; height: 34px; padding: 0; margin: 0;
+    display: inline-flex; align-items: center; justify-content: center; font-size: 15px; }
   .add-leg { margin-top: 2px; }
 
   /* 時間邏輯紅字警告 */
@@ -392,6 +407,8 @@
   /* 清單編輯 */
   .cl-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
   .cl-name-input { font-size: 20px; font-weight: 700; padding: 7px 11px; border: 1px solid var(--border); border-radius: 8px; min-width: 260px; font-family: inherit; }
+  /* 表格外層:欄數固定,容器不夠寬時由此橫向捲動(寬螢幕不會出現捲軸) */
+  .cl-wrap { overflow-x: auto; }
   .cl-table { width: 100%; border-collapse: collapse; background: var(--panel); }
   .cl-table th, .cl-table td { border: 1px solid var(--border); padding: 8px; vertical-align: middle; text-align: center; }
   .cl-table th { background: var(--day-head); font-size: 13px; white-space: nowrap; }
@@ -462,6 +479,31 @@
     position: fixed; left: 26px; bottom: 26px; z-index: 30;
     display: flex; flex-direction: column; gap: 12px; align-items: flex-start;
   }
+  /* 窄螢幕浮動選單(右下角圓形鈕 + 彈出清單)。
+     預設 display:none —— 只有 RWD 區塊會把它打開,桌機沿用原本三顆浮動鈕。
+     .hidden 帶 !important,所以「非編輯畫面」的隱藏永遠優先。 */
+  .fab-menu-wrap { display: none; position: fixed; right: 16px; bottom: 16px; z-index: 30; }
+  .fab-menu-btn {
+    width: 52px; height: 52px; border-radius: 50%; padding: 0;
+    background: var(--accent); color: #fff; border: none;
+    font-size: 22px; line-height: 1;
+    box-shadow: 0 6px 18px rgba(37,99,235,.35);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .fab-menu-btn:hover, .fab-menu-btn.on { background: var(--accent-dark); color: #fff; }
+  .fab-menu-panel {
+    position: absolute; right: 0; bottom: 62px;   /* 疊在圓形鈕正上方,右緣對齊 */
+    display: flex; flex-direction: column; gap: 4px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    padding: 6px; box-shadow: 0 12px 32px rgba(0,0,0,.22); min-width: 176px;
+  }
+  .fab-menu-item {
+    text-align: left; white-space: nowrap; font-size: 14px;
+    padding: 11px 12px; border: 1px solid transparent; border-radius: 8px;
+    background: transparent; color: var(--text);
+  }
+  .fab-menu-item:hover { background: var(--day-head); border-color: var(--accent); color: var(--accent); }
+
   /* 天數順序面板 */
   .day-order-row {
     display: flex; align-items: center; gap: 10px;
@@ -705,6 +747,172 @@
     .pdf-day, .pdf-act, .pdf-hotel { break-inside: avoid; }
     table.pdf-cl tr { break-inside: avoid; }
   }
+
+  /* ==========================================================
+     響應式(手機 / 平板)—— 僅 web 版
+     規則一律寫在這個區塊內、以 max-width 覆寫,寬螢幕不受影響。
+     日後若要合併回 online/,整塊搬過去即可(純新增)。
+     ========================================================== */
+
+  /* 首頁四顆大按鈕:寬度不足時改兩欄,不要一顆一行 */
+  @media (max-width: 860px) {
+    .home-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+                    width: 100%; max-width: 440px; margin: 0 auto; }
+    .big-btn { width: auto; height: 120px; }
+  }
+
+  /* 窄螢幕(手機直向為主):結構調整 */
+  @media (max-width: 720px) {
+    /* 頂部工具列:單列、只留圖示,必要時可水平捲動
+       (原本會把品名與按鈕壓成垂直逐字,實測高度達 193px) */
+    header.appbar { flex-wrap: nowrap; overflow-x: auto; gap: 8px; padding: 8px 6px 8px 10px;
+                    scrollbar-width: none; }
+    header.appbar::-webkit-scrollbar { display: none; }
+    header.appbar .brand { flex: 0 1 auto; min-width: 0; white-space: nowrap;
+                           overflow: hidden; text-overflow: ellipsis; font-size: 15px; }
+    /* spacer 必須保留(不能 display:none):它是彈性元素,有餘裕時把空間全數放到
+       「品名 ↔ 圖示群」之間,沒餘裕時自動退回 0(英文品名較長時仍不撐破版面);
+       它本身也會多產生一個 gap,故分隔至少是 2×gap。關掉它會讓多餘空間改堆在
+       最後一顆按鈕之後,看起來就是「圖示沒有貼右、卻又跟品名擠在一起」。
+       圖示彼此的間距收到 6px,省下的寬度補回給品名(實測 100 → 114px,中文不再截斷)。 */
+    header.appbar .spacer { display: block; flex: 1 1 0; min-width: 0; }
+    #editorTools { flex: 0 0 auto; gap: 6px; }
+    /* 只留圖示後,原本的左右 padding 會把單一字元的按鈕拉成長方形、白白吃掉橫向空間。
+       改為固定正方形並置中圖示;圖示刻意小於方框,留出呼吸空間(不必佔滿)。
+       以 [data-i18n-split] 為開關:工具列與總覽彈窗標題列共用同一套規則,
+       日後任何按鈕要在窄螢幕只留圖示,加上該屬性即可,不必再寫 CSS。 */
+    .appbar button,
+    .modal-head button[data-i18n-split] {
+                     flex: 0 0 auto; white-space: nowrap;
+                     width: 38px; height: 38px; padding: 0;
+                     display: inline-flex; align-items: center; justify-content: center; }
+    [data-i18n-split] .bl { display: none; }   /* 只留圖示;完整名稱仍在 title / aria-label */
+    [data-i18n-split] .bi { font-size: 18px; line-height: 1; }
+
+    /* 編輯畫面:左側垂直父頁籤改為上方水平列(省下 48px 寬,並解決與內容重疊)
+       align-items 必須改回 stretch:原本的 flex-start 在縱向容器裡會讓子項取
+       fit-content 寬,被標題 input 的最小內容寬撐出 24px 水平溢出。 */
+    #viewEditor { flex-direction: column; gap: 12px; align-items: stretch; }
+    /* html[lang="en"] .tab-bar{width:128px} 特異度高於單一 class,英文版不加同等
+       特異度的覆寫就會停在 128px、吃不到這裡的水平滿版 */
+    .tab-bar, html[lang="en"] .tab-bar { flex-direction: row; width: 100%; position: static; gap: 6px; }
+    .ptab, html[lang="en"] .ptab { flex: 1 1 0; padding: 8px 6px; }
+    .ptab-label { writing-mode: horizontal-tb; text-orientation: mixed;
+                  letter-spacing: normal; font-size: 13px; line-height: 1.2; text-align: center; }
+
+    /* 標題列:標題與「顯示方式」鈕分行。
+       .itin-head 的第一層 div 沒有 min-width:0,24px 字級 input 的固有寬度
+       會把整列撐到 601px(視窗僅 376px)→ 產生全頁水平捲動。 */
+    .itin-head { flex-wrap: wrap; gap: 8px; }
+    .itin-head > div { flex: 1 1 100%; min-width: 0; }
+    .editor-title-input { font-size: 20px; }
+
+    /* 行程欄位改單欄,否則出發地/抵達地輸入框只剩幾個字元寬。
+       只改欄數不夠:1fr 等同 minmax(auto,1fr),軌道最小寬取「該欄所有 item 的
+       min-content 最大值」,而 grid item 預設 min-width:auto 不可壓縮。實測撐開軌道的
+       是橫跨整列的 .trans-section(轉乘列 min-content 663px),它把同欄的 .cell 一起
+       拉成 663px,再被 .day-block 的 overflow:hidden 裁掉 —— 出發地右半與時間欄
+       在手機上整個看不見。故撐開軌道的與被拉寬的都要歸零(實測 430px 視窗:663 → 347)。 */
+    .act-grid { grid-template-columns: 1fr; gap: 8px; }
+    .act-grid > .cell, .act-grid > .trans-section { min-width: 0; }
+    .cell .inline > input { min-width: 0; }
+
+    /* 移動區間(轉乘列):桌機的單列橫排在手機只能靠橫向捲動,右半欄位等於藏起來。
+       改為三列,左側是「地點 + 該地點的時間」,其餘欄位靠右切齊:
+           手段 ──────────────┤ 刪除
+           出發 │ 出發時間 ───┤ 移動時間
+           抵達 │ 抵達時間 ───┤ 花費
+       手段橫跨左兩欄,地點欄因而從 81px 放寬到 119px,右側也不再空一塊。
+       用 grid 明確指定位置即可達成,**不動 legHTML 的 DOM 順序**,桌機版面因而完全不受影響
+       (離線版日後整塊搬過去也仍是純新增)。nth-child 對應 legHTML 的輸出順序:
+       1 手段 / 2 出發 / 3 抵達 / 4 出發時間 / 5 抵達時間 / 6 移動時間 / 7 花費 / 8 刪除鈕。 */
+    .leg {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
+      /* 靠上對齊,同一列的 label 才會齊平:時間欄出現紅字警告時該格會變高,
+         用基礎樣式的 flex-end 會把「抵達」整組往下推 20px、與「抵達時間」錯開 */
+      align-items: start;
+      overflow-x: visible;                  /* 已不再溢出,不需要橫向捲軸 */
+    }
+    /* .leg .lg.grow 的 min-width:90px 特異度高於 .leg > .lg,需一併覆寫才不會卡住 1fr 收縮 */
+    .leg > .lg, .leg > .lg.grow { min-width: 0; }
+    .leg > .lg input { min-width: 0; }
+    .leg > .lg:nth-child(1) { grid-area: 1 / 1 / 2 / 3; }   /* 手段:橫跨左兩欄 */
+    .leg > .lg:nth-child(2) { grid-area: 2 / 1; }           /* 出發 */
+    .leg > .lg:nth-child(4) { grid-area: 2 / 2; }           /* 出發時間 */
+    .leg > .lg:nth-child(3) { grid-area: 3 / 1; }           /* 抵達 */
+    .leg > .lg:nth-child(5) { grid-area: 3 / 2; }           /* 抵達時間 */
+    /* 右欄三者共用同一條 auto 軌道(寬度取最寬的花費框),justify-self 讓右緣切齊 */
+    .leg > .lg:nth-child(6) { grid-area: 2 / 3; justify-self: end; }   /* 移動時間 */
+    .leg > .lg:nth-child(7) { grid-area: 3 / 3; justify-self: end; }   /* 花費 */
+    /* 移動時間框基礎寬 64px,與 84px 的花費框並排會讓兩者的 label 錯開;改為同寬。
+       不用 width:auto 拉伸:auto 軌道會改抓輸入框的固有寬(實測 182px)而撐破版面。
+       金額很長時(如 NT$1234567 → 100px)軌道自行加寬,兩者仍右緣切齊、不溢出。 */
+    .leg > .lg.lg-dur { width: 84px; }
+    /* 刪除鈕靠右下:它沒有 label,不靠下會浮在 label 的高度上(方形尺寸見基礎 CSS) */
+    .leg > .del-leg { grid-area: 1 / 3; justify-self: end; align-self: end; }
+    /* 時間邏輯紅字:格子只有 74px 寬,不放寬會被折成一長條。以 max-content 往右側
+       (該列右欄下方的空白處)延伸,仍受既有 max-width:160px 收斂,不會超出轉乘列。 */
+    .leg > .lg .warn { width: max-content; }
+
+    /* 三顆長條浮動鈕在手機會佔掉畫面下緣一大片(左右各一堆,還會遮住最後一筆行程),
+       改為收進右下角一顆圓形選單;原本的三顆整組隱藏,桌機不受影響。 */
+    .fab-stack, .fab-stack-left { display: none; }
+    .fab-menu-wrap { display: block; right: 12px; bottom: 12px; }
+
+    /* 內嵌地圖:260px 在手機上會佔掉大半個畫面 */
+    .act-map iframe { height: 200px; }
+
+    /* 地圖鈕與刪除鈕的正方形化已移至基礎 CSS(桌機同步套用),此處不再重複 */
+
+    /* 清單:名稱輸入框的 min-width:260px 會撐破視窗;表格欄數固定(最多 6 欄)且含
+       112px 縮圖,寧可讓 .cl-wrap 橫向捲動,也不要讓整頁產生水平捲軸。 */
+    .list-head { flex-wrap: wrap; gap: 8px; }
+    .subtab { max-width: 46vw; }
+    .cl-name-input { min-width: 0; width: 100%; font-size: 17px; }
+    .cl-table { min-width: 440px; }        /* 再窄下去欄位會擠到不可讀 → 交給橫向捲動 */
+    .cl-table th, .cl-table td { padding: 6px; }
+    .cl-table input.qty { width: 56px; }
+    .cl-thumb { width: 76px; height: 76px; }
+
+    /* 彈窗(總覽 / 日期框架 / 日本景點 / 行程建議 / 設定):滿版化 */
+    .overlay { padding: 10px; }
+    .overlay .modal { max-height: 94vh; }
+    .overlay .modal-head { padding: 12px 14px; }
+    .overlay .modal-body { padding: 14px; }
+    .days-panel-foot { flex-wrap: wrap; }
+
+    /* 設定面板:幣別下拉的 min-width:240px 在 320px 視窗會溢出 */
+    .set-row select { min-width: 0; width: 100%; }
+
+    /* 花費彈窗:金額 + 幣別合計約 340px,窄視窗即使貼齊邊界仍會溢出 */
+    .cost-pop input { width: 84px; }
+    .cost-pop select { max-width: 148px; }
+
+    /* 新建行程:讓年 / 月 / 日維持同一列(預設 min-width:160px 會折成兩列) */
+    .form-row .field { min-width: 92px; }
+    .card { padding: 16px; }
+  }
+
+  @media (max-width: 560px) {
+    main { padding: 16px 12px 150px; }
+    .appbar button,
+    .modal-head button[data-i18n-split] { width: 34px; height: 34px; }
+    [data-i18n-split] .bi { font-size: 16px; }
+    /* 375/376px(iPhone SE~X 等常見寬度)時品名只差 1px 就完整,會斷成「行程規劃工…」。
+       右內距與圖示間距各再收一點,共補回 6px,讓這些寬度能完整顯示品名。
+       更窄的裝置(如 360px)仍會截斷,屬預期。 */
+    header.appbar { gap: 6px; padding-right: 4px; }
+    #editorTools { gap: 5px; }
+    .home-wrap { gap: 20px; margin-top: 4vh; }
+    .home-wrap h1 { font-size: 26px; }
+    .big-btn { height: 104px; font-size: 15px; }
+    .big-btn .glyph { font-size: 28px; }
+    .overlay { padding: 6px; }
+    .overlay .modal-body { padding: 12px; }
+  }
 </style>
 </head>
 <body>
@@ -712,13 +920,13 @@
 <header class="appbar no-print">
   <span class="brand" data-i18n="brand">🧭 行程規劃工具</span>
   <span class="spacer"></span>
-  <button onclick="openSettings()" data-i18n-title="tipSettings" data-i18n="btnSettings">⚙️ 設定</button>
-  <div id="editorTools" class="hidden" style="display:flex; gap:10px;">
-    <button class="primary" onclick="saveItinerary()" data-i18n="btnSave">💾 儲存行程</button>
-    <button onclick="saveItineraryAs()" data-i18n="btnSaveAs">📁 另存新檔</button>
-    <button onclick="exportPDF()" data-i18n="btnPDF">📄 匯出 PDF</button>
-    <button onclick="exportExcel()" data-i18n="btnExcel">📊 匯出 Excel</button>
-    <button class="ghost-danger" onclick="goHome()" data-i18n="btnHome">← 回首頁</button>
+  <button onclick="openSettings()" data-i18n-title="tipSettings" data-i18n="btnSettings" data-i18n-split>⚙️ 設定</button>
+  <div id="editorTools" class="hidden">
+    <button id="btnSaveItin" onclick="saveItinerary()" data-i18n="btnSave" data-i18n-split>💾 儲存行程</button>
+    <button onclick="saveItineraryAs()" data-i18n="btnSaveAs" data-i18n-split>📁 另存新檔</button>
+    <button onclick="exportPDF()" data-i18n="btnPDF" data-i18n-split>📄 匯出 PDF</button>
+    <button onclick="exportExcel()" data-i18n="btnExcel" data-i18n-split>📊 匯出 Excel</button>
+    <button class="ghost-danger" onclick="goHome()" data-i18n="btnHome" data-i18n-split>🏠 回首頁</button>
   </div>
 </header>
 
@@ -827,7 +1035,7 @@
     <div class="modal-head">
       <strong data-i18n="settingsTitle">⚙️ 設定</strong>
       <span class="spacer"></span>
-      <button class="ghost-danger" onclick="closeSettings()" data-i18n="btnClose">✕ 關閉</button>
+      <button class="ghost-danger" onclick="closeSettings()" data-i18n="btnClose" data-i18n-split>✕ 關閉</button>
     </div>
     <div class="modal-body">
       <div class="set-row">
@@ -876,15 +1084,27 @@
   </button>
 </div>
 
+<!-- 窄螢幕專用:把上面三顆浮動鈕收成右下角一顆圓形選單(桌機仍用原本的三顆,見 RWD 區塊)。
+     選單項目直接呼叫既有的開啟函式,不重複實作邏輯;文字沿用同一組 i18n key。 -->
+<div id="fabMenuWrap" class="fab-menu-wrap no-print hidden">
+  <div id="fabMenuPanel" class="fab-menu-panel hidden">
+    <button class="fab-menu-item" onclick="fabMenuPick('days')" data-i18n="fabDays">🗓️ 日程設定</button>
+    <button class="fab-menu-item" onclick="fabMenuPick('overview')" data-i18n="fabOverview">📋 行程總覽</button>
+    <button class="fab-menu-item" onclick="fabMenuPick('jp')" data-i18n="fabJp">🗾 日本景點參考</button>
+  </div>
+  <button id="fabMenuBtn" class="fab-menu-btn" onclick="fabMenuToggle(event)"
+          data-i18n-title="fabMenu" data-i18n-aria="fabMenu" title="選單" aria-label="選單">☰</button>
+</div>
+
 <!-- 總覽彈窗 -->
 <div id="overlay" class="overlay no-print hidden" onclick="onOverlayClick(event)">
   <div class="modal">
     <div class="modal-head">
       <strong data-i18n="overviewTitle">行程總覽</strong>
       <span class="spacer"></span>
-      <button onclick="exportPDF()" data-i18n="btnPDF">📄 匯出 PDF</button>
-      <button onclick="exportExcel()" data-i18n="btnExcel">📊 匯出 Excel</button>
-      <button class="ghost-danger" onclick="closeOverview()" data-i18n="btnClose">✕ 關閉</button>
+      <button onclick="exportPDF()" data-i18n="btnPDF" data-i18n-split>📄 匯出 PDF</button>
+      <button onclick="exportExcel()" data-i18n="btnExcel" data-i18n-split>📊 匯出 Excel</button>
+      <button class="ghost-danger" onclick="closeOverview()" data-i18n="btnClose" data-i18n-split>✕ 關閉</button>
     </div>
     <div class="modal-body" id="overviewBody"></div>
   </div>
@@ -896,7 +1116,7 @@
     <div class="modal-head">
       <strong data-i18n="daysPanelTitle">日程設定</strong>
       <span class="spacer"></span>
-      <button class="ghost-danger" onclick="closeDaysPanel()" data-i18n="btnClose">✕ 關閉</button>
+      <button class="ghost-danger" onclick="closeDaysPanel()" data-i18n="btnClose" data-i18n-split>✕ 關閉</button>
     </div>
     <div class="modal-body">
       <div class="days-panel-ctrls">
@@ -944,7 +1164,7 @@
     <div class="modal-head">
       <strong data-i18n="jpTitle">日本景點參考</strong>
       <span class="spacer"></span>
-      <button class="ghost-danger" onclick="closeJpPreview()" data-i18n="btnClose">✕ 關閉</button>
+      <button class="ghost-danger" onclick="closeJpPreview()" data-i18n="btnClose" data-i18n-split>✕ 關閉</button>
     </div>
     <div class="modal-body" id="jpPreviewBody"></div>
   </div>
@@ -956,7 +1176,7 @@
     <div class="modal-head">
       <strong id="jpAssignTitle">加入行程</strong>
       <span class="spacer"></span>
-      <button class="ghost-danger" onclick="closeJpAssign()">✕ 關閉</button>
+      <button class="ghost-danger" onclick="closeJpAssign()" data-i18n="btnClose" data-i18n-split>✕ 關閉</button>
     </div>
     <div class="modal-body" id="jpAssignBody"></div>
   </div>
@@ -968,7 +1188,7 @@
     <div class="modal-head">
       <strong data-i18n="tripPlanTitle">🗺️ 行程建議</strong>
       <span class="spacer"></span>
-      <button class="ghost-danger" onclick="closeTripPlan()" data-i18n="btnClose">✕ 關閉</button>
+      <button class="ghost-danger" onclick="closeTripPlan()" data-i18n="btnClose" data-i18n-split>✕ 關閉</button>
     </div>
     <div class="modal-body" id="tripPlanBody"></div>
   </div>
@@ -1003,7 +1223,7 @@ function saveAppSettings(){ try { localStorage.setItem(APP_KEY, JSON.stringify(a
 var I18N = {
   "zh-Hant": {
     brand: "🧭 行程規劃工具",
-    btnSettings: "⚙️ 設定", btnSave: "💾 儲存行程", btnSaveAs: "📁 另存新檔", btnPDF: "📄 匯出 PDF", btnExcel: "📊 匯出 Excel", btnHome: "← 回首頁",
+    btnSettings: "⚙️ 設定", btnSave: "💾 儲存行程", btnSaveAs: "📁 另存新檔", btnPDF: "📄 匯出 PDF", btnExcel: "📊 匯出 Excel", btnHome: "🏠 回首頁",
     homeTitle: "行程規劃", btnNew: "新建行程", btnLoad: "讀取行程", btnResume: "繼續上次行程", btnTripPlan: "行程建議", btnJpPreview: "日本景點參考", jpTitle: "日本景點參考",
     tripPlanTitle: "🗺️ 行程建議", tripPlanHint: "選擇目的地與天數,立即產生經典行程範本。範本僅安排景點,餐食與住宿請自行新增;產生後所有內容皆可再編輯。",
     tplDayBtn: "{n} 日", tplSpots: "{c} 個景點", tplAreaLbl: "涵蓋",
@@ -1013,7 +1233,7 @@ var I18N = {
     settingsTitle: "⚙️ 設定", btnClose: "✕ 關閉", lblTheme: "佈景模式", themeLight: "一般", themeDark: "深色", themeSoft: "柔和",
     lblCurrency: "預設幣別", lblLang: "語言",
     fabOverview: "📋 行程總覽", overviewTitle: "行程總覽", fabJp: "🗾 日本景點參考",
-    fabDays: "🗓️ 日程設定", daysPanelTitle: "日程設定(出發日・天數・順序)",
+    fabDays: "🗓️ 日程設定", fabMenu: "選單", daysPanelTitle: "日程設定(出發日・天數・順序)",
     daysDelDivider: "以下行程將會刪除", daysAddDivider: "以下為新增的空白天", daysWillDelete: "將刪除", daysNewBlank: "(新增空白天)", daysAddTag: "新增",
     btnApplyDays: "✓ 套用", daysDateChange: "出發日 {from} → {to}", daysCountChange: "共 {from} 天 → {to} 天", daysDelWarn: "將刪除的天中有 {n} 天含行程內容",
     msgDelDaysConfirm: "將刪除 {del} 天(其中 {n} 天含行程內容),此動作無法復原,確定套用?", msgDaysApplied: "已更新日程",
@@ -1078,7 +1298,7 @@ var I18N = {
   },
   "ja": {
     brand: "🧭 旅程プランナー",
-    btnSettings: "⚙️ 設定", btnSave: "💾 保存", btnSaveAs: "📁 名前を付けて保存", btnPDF: "📄 PDF 出力", btnExcel: "📊 Excel 出力", btnHome: "← ホーム",
+    btnSettings: "⚙️ 設定", btnSave: "💾 保存", btnSaveAs: "📁 名前を付けて保存", btnPDF: "📄 PDF 出力", btnExcel: "📊 Excel 出力", btnHome: "🏠 ホーム",
     homeTitle: "旅程プランニング", btnNew: "新規作成", btnLoad: "読み込み", btnResume: "前回の続き", btnTripPlan: "旅程のおすすめ", btnJpPreview: "日本の名所", jpTitle: "日本の名所（参考）",
     tripPlanTitle: "🗺️ 旅程のおすすめ", tripPlanHint: "行き先と日数を選ぶと、定番の旅程テンプレートをすぐに作成します。テンプレートは観光スポットのみで、食事と宿泊は含みません。作成後はすべて編集できます。",
     tplDayBtn: "{n} 日間", tplSpots: "スポット {c} か所", tplAreaLbl: "エリア",
@@ -1088,7 +1308,7 @@ var I18N = {
     settingsTitle: "⚙️ 設定", btnClose: "✕ 閉じる", lblTheme: "テーマ", themeLight: "ライト", themeDark: "ダーク", themeSoft: "ソフト",
     lblCurrency: "既定の通貨", lblLang: "言語",
     fabOverview: "📋 旅程概要", overviewTitle: "旅程概要", fabJp: "🗾 日本の名所",
-    fabDays: "🗓️ 日程設定", daysPanelTitle: "日程の調整",
+    fabDays: "🗓️ 日程設定", fabMenu: "メニュー", daysPanelTitle: "日程の調整",
     daysDelDivider: "以下の日は削除されます", daysAddDivider: "以下は新規追加の空白日", daysWillDelete: "削除", daysNewBlank: "(新規の空白日)", daysAddTag: "追加",
     btnApplyDays: "✓ 適用", daysDateChange: "出発日 {from} → {to}", daysCountChange: "全 {from} 日 → {to} 日", daysDelWarn: "削除される日のうち {n} 日に予定内容があります",
     msgDelDaysConfirm: "{del} 日を削除します(うち {n} 日に予定内容あり)。この操作は元に戻せません。適用しますか?", msgDaysApplied: "日程を適用しました",
@@ -1153,7 +1373,7 @@ var I18N = {
   },
   "en": {
     brand: "🧭 Itinerary Planner",
-    btnSettings: "⚙️ Settings", btnSave: "💾 Save", btnSaveAs: "📁 Save As", btnPDF: "📄 Export PDF", btnExcel: "📊 Export Excel", btnHome: "← Home",
+    btnSettings: "⚙️ Settings", btnSave: "💾 Save", btnSaveAs: "📁 Save As", btnPDF: "📄 Export PDF", btnExcel: "📊 Export Excel", btnHome: "🏠 Home",
     homeTitle: "Itinerary Planner", btnNew: "New Itinerary", btnLoad: "Load", btnResume: "Resume Last", btnTripPlan: "Suggested Plans", btnJpPreview: "Japan Spots", jpTitle: "Japan Spots (reference)",
     tripPlanTitle: "🗺️ Suggested Plans", tripPlanHint: "Pick a destination and length to generate a classic itinerary template. Templates cover sightseeing only — add meals and hotels yourself. Everything stays editable afterwards.",
     tplDayBtn: "{n} days", tplSpots: "{c} spots", tplAreaLbl: "Covers",
@@ -1163,7 +1383,7 @@ var I18N = {
     settingsTitle: "⚙️ Settings", btnClose: "✕ Close", lblTheme: "Theme", themeLight: "Light", themeDark: "Dark", themeSoft: "Soft",
     lblCurrency: "Default Currency", lblLang: "Language",
     fabOverview: "📋 Overview", overviewTitle: "Itinerary Overview", fabJp: "🗾 Japan Spots",
-    fabDays: "🗓️ Day Setup", daysPanelTitle: "Day Setup (start date · days · order)",
+    fabDays: "🗓️ Day Setup", fabMenu: "Menu", daysPanelTitle: "Day Setup (start date · days · order)",
     daysDelDivider: "The following days will be deleted", daysAddDivider: "New blank days to be added", daysWillDelete: "Delete", daysNewBlank: "(new blank day)", daysAddTag: "Add",
     btnApplyDays: "✓ Apply", daysDateChange: "Start {from} → {to}", daysCountChange: "{from} days → {to} days", daysDelWarn: "{n} of the days to delete contain plans",
     msgDelDaysConfirm: "Delete {del} day(s) ({n} with plans)? This cannot be undone. Apply?", msgDaysApplied: "Day setup updated",
@@ -1242,9 +1462,31 @@ function curName(code){
 }
 function applyStaticI18n(){
   var qa = function(sel){ return Array.prototype.slice.call(document.querySelectorAll(sel)); };
-  qa("[data-i18n]").forEach(function(el){ el.textContent = t(el.getAttribute("data-i18n")); });
+  qa("[data-i18n]").forEach(function(el){
+    var s = t(el.getAttribute("data-i18n"));
+    // data-i18n-split:把「圖示 + 空格 + 文字」拆成兩個 span,窄螢幕可只留圖示
+    // (三語的工具列字串一律是 emoji/箭號 + 半形空格 + 文字)
+    if (el.hasAttribute("data-i18n-split")){
+      var p = s.indexOf(" ");
+      el.textContent = "";
+      var ic = document.createElement("span"); ic.className = "bi";
+      ic.textContent = p > 0 ? s.slice(0, p) : s;
+      el.appendChild(ic);
+      if (p > 0){
+        var lb = document.createElement("span"); lb.className = "bl";
+        lb.textContent = s.slice(p + 1);
+        el.appendChild(lb);
+      }
+      el.setAttribute("aria-label", s);                                  // 只剩圖示時仍可辨識
+      if (!el.hasAttribute("data-i18n-title")){ el.setAttribute("title", s); }
+      return;
+    }
+    el.textContent = s;
+  });
   qa("[data-i18n-ph]").forEach(function(el){ el.setAttribute("placeholder", t(el.getAttribute("data-i18n-ph"))); });
   qa("[data-i18n-title]").forEach(function(el){ el.setAttribute("title", t(el.getAttribute("data-i18n-title"))); });
+  // 純圖示按鈕(本身沒有可讀文字,也不走 data-i18n-split)需要單獨的無障礙名稱
+  qa("[data-i18n-aria]").forEach(function(el){ el.setAttribute("aria-label", t(el.getAttribute("data-i18n-aria"))); });
   document.documentElement.setAttribute("lang", LANG());
 }
 
@@ -1391,6 +1633,8 @@ function costOpen(el, e){
   var left = r.left + window.scrollX;
   var maxLeft = window.scrollX + document.documentElement.clientWidth - pop.offsetWidth - 8;
   if (left > maxLeft){ left = maxLeft; }
+  // 視窗比彈窗還窄時 maxLeft 會小於左邊界,夾右緣反而把彈窗推出畫面左側 → 補夾左緣
+  if (left < window.scrollX + 8){ left = window.scrollX + 8; }
   pop.style.top = (r.bottom + window.scrollY + 4) + "px";
   pop.style.left = left + "px";
   $("costAmt").focus();
@@ -1439,9 +1683,31 @@ function show(view){
   $("fabOverview").classList.toggle("hidden", view !== "viewEditor");
   $("fabDays").classList.toggle("hidden", view !== "viewEditor");
   $("fabJp").classList.toggle("hidden", view !== "viewEditor");
+  $("fabMenuWrap").classList.toggle("hidden", view !== "viewEditor");   // 窄螢幕的圓形選單同進退
+  fabMenuClose();
   if (view !== "viewEditor"){ closeOverview(); closeDaysPanel(); }
 }
 function goHome(){ show("viewHome"); refreshResumeBtn(); }
+
+/* ---------- 窄螢幕浮動選單(右下角圓形鈕;桌機不顯示,見 RWD 區塊) ----------
+   只做「開關 + 轉呼叫」,三個項目一律導到既有的開啟函式,避免與原本的浮動鈕邏輯分岔。 */
+function fabMenuOpen(){ return !$("fabMenuPanel").classList.contains("hidden"); }
+function fabMenuClose(){
+  $("fabMenuPanel").classList.add("hidden");
+  $("fabMenuBtn").classList.remove("on");
+}
+function fabMenuToggle(e){
+  if (e){ e.stopPropagation(); }   // 否則會立刻被下面的「點外面關閉」收掉
+  var open = !fabMenuOpen();
+  $("fabMenuPanel").classList.toggle("hidden", !open);
+  $("fabMenuBtn").classList.toggle("on", open);
+}
+function fabMenuPick(kind){
+  fabMenuClose();
+  if (kind === "days"){ openDaysPanel(); }
+  else if (kind === "overview"){ openOverview(); }
+  else { openJpPreview(); }
+}
 
 /* ---------- 新建流程 ---------- */
 function showNewForm(){
@@ -1973,8 +2239,8 @@ function renderList(kind, ci){
       '<input class="cl-name-input" type="text" value="' + escAttr(cl.name) + '" placeholder="' + escAttr(t("listLabel_" + kind) + t("nameSuffix")) + '" ' +
         'oninput="updateListName(\'' + kind + '\',' + ci + ',this.value)">' +
     '</div>' +
-    '<table class="cl-table"><thead><tr>' + headCols + '<th class="no-print"></th>' +
-    '</tr></thead><tbody>' + (cl.items.length ? rows : emptyRow) + '</tbody></table>' +
+    '<div class="cl-wrap"><table class="cl-table"><thead><tr>' + headCols + '<th class="no-print"></th>' +
+    '</tr></thead><tbody>' + (cl.items.length ? rows : emptyRow) + '</tbody></table></div>' +
     '<button class="add-item no-print icon" onclick="addListItem(\'' + kind + '\',' + ci + ')">' + t("addItem") + '</button>';
 }
 function escAttr(s){ return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/"/g,"&quot;"); }
@@ -2096,8 +2362,9 @@ function dayBlockHTML(di){
       '<span class="day-date">' + mmdd(date) + '(' + weekday(date) + ')</span>' +
       '<span class="spacer"></span>' +
       '<button class="map-btn no-print" id="mapbtn-d' + di + '"' +
-        ' title="' + escAttr(t("mapDayHint")) + '"' +
-        ' onclick="toggleDayMap(' + di + ')">🗺️ ' + t("mapDayLabel") + '</button>' +
+        ' title="' + escAttr(t("mapDayLabel") + " ・ " + t("mapDayHint")) + '"' +
+        ' aria-label="' + escAttr(t("mapDayLabel")) + '"' +   // 只剩圖示,用途改由此標示
+        ' onclick="toggleDayMap(' + di + ')">🗺️</button>' +
     '</div>' +
     '<div class="act-map no-print hidden" id="map-d' + di + '"></div>' +
     '<div class="activities">' + acts +
@@ -5827,6 +6094,7 @@ function tpOpen(el, e){
   var left = r.left + window.scrollX;
   var maxLeft = window.scrollX + document.documentElement.clientWidth - pop.offsetWidth - 8;
   if (left > maxLeft){ left = maxLeft; }
+  if (left < window.scrollX + 8){ left = window.scrollX + 8; }   // 同 costOpen:窄視窗需補夾左緣
   pop.style.top = (r.bottom + window.scrollY + 4) + "px";
   pop.style.left = left + "px";
   tpScrollTo("tpHours", p.hh);
@@ -5965,9 +6233,21 @@ function legHTML(di, ai, ti, tr){
 }
 
 /* ---------- 儲存 / 匯出 / 讀取 ---------- */
+/* 「💾 儲存行程」的高亮:原本 class="primary" 寫死,讀取行程進來、什麼都沒改也是藍的,
+   等於永遠亮著、沒有提示作用。改為只在「有尚未存回檔案的變更」時才高亮:
+   ● save() 是每次資料異動都會呼叫的 localStorage 自動存檔 → 以它為「有變更」的唯一入口;
+   ● 存檔 / 另存 / 匯出 JSON 成功、以及讀取行程進來 → 歸零;
+   ● 新建行程尚無來源檔,save() 會把它標為有變更(確實需要存檔),此為刻意。 */
+var fileDirty = false;
+function setDirty(v){
+  fileDirty = !!v;
+  var b = $("btnSaveItin");
+  if (b){ b.classList.toggle("primary", fileDirty); }
+}
 var quotaWarned = false;
 function save(){
   if (!state){ return; }
+  setDirty(true);
   try {
     localStorage.setItem(LS_KEY, JSON.stringify(state));
   } catch (e){
@@ -5987,6 +6267,7 @@ function exportItinerary(){
   a.download = safeFileName(docTitle()) + ".json";
   a.click();
   URL.revokeObjectURL(url);
+  setDirty(false);
   toast(t("msgSavedJSON"));
 }
 
@@ -6036,7 +6317,7 @@ function writeToHandle(h){
 function saveItinerary(){
   if (!state){ return; }
   if (fileHandle && window.showSaveFilePicker){
-    writeToHandle(fileHandle).then(function(){ toast(t("msgSavedFile")); })
+    writeToHandle(fileHandle).then(function(){ setDirty(false); toast(t("msgSavedFile")); })
       .catch(function(e){ if (!(e && e.name === "AbortError")){ saveItineraryAs(); } });
     return;
   }
@@ -6051,7 +6332,7 @@ function saveItineraryAs(){
     var startH = fileHandle || lastDirHandle;
     if (startH){ opts.startIn = startH; }
     window.showSaveFilePicker(opts)
-      .then(function(h){ return writeToHandle(h).then(function(){ setFileHandle(h); toast(t("msgSavedFile")); }); })
+      .then(function(h){ return writeToHandle(h).then(function(){ setFileHandle(h); setDirty(false); toast(t("msgSavedFile")); }); })
       .catch(function(e){ if (!(e && e.name === "AbortError")){ exportItinerary(); } });
     return;
   }
@@ -6670,6 +6951,7 @@ function loadStateFromText(text){
     save();
     renderEditor();
     show("viewEditor");
+    setDirty(false);        // 剛讀進來 = 與檔案一致,儲存鈕不該亮(save() 上面已標為 true)
     toast(t("msgLoaded"));
     return true;
   } catch(err){
@@ -6811,6 +7093,12 @@ function waitImagesReady(root, timeoutMs){
     if (pop.contains(e.target)){ return; }
     if (costTarget && costTarget.contains(e.target)){ return; }
     costClose();
+  });
+  // 浮動選單:點選單以外的地方就收起(觸發鈕自己會 stopPropagation)
+  document.addEventListener("click", function(e){
+    if (!fabMenuOpen()){ return; }
+    if ($("fabMenuWrap").contains(e.target)){ return; }
+    fabMenuClose();
   });
   applyStaticI18n();
   sizeFabs();  // 右下浮動鈕固定為三語系最寬尺寸
