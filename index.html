@@ -927,7 +927,7 @@
   <div id="editorTools" class="hidden">
     <button id="btnSaveItin" onclick="saveItinerary()" data-i18n="btnSave" data-i18n-split>💾 儲存行程</button>
     <button onclick="saveItineraryAs()" data-i18n="btnSaveAs" data-i18n-split>📁 另存新檔</button>
-    <button onclick="exportPDF()" data-i18n="btnPDF" data-i18n-split>📄 匯出 PDF</button>
+    <button onclick="exportPDF()" data-i18n="btnPDF" data-i18n-split>🖨️ 匯出 PDF</button>
     <button onclick="exportExcel()" data-i18n="btnExcel" data-i18n-split>📊 匯出 Excel</button>
     <button class="ghost-danger" onclick="goHome()" data-i18n="btnHome" data-i18n-split>🏠 回首頁</button>
   </div>
@@ -1105,7 +1105,7 @@
     <div class="modal-head">
       <strong data-i18n="overviewTitle">行程總覽</strong>
       <span class="spacer"></span>
-      <button onclick="exportPDF()" data-i18n="btnPDF" data-i18n-split>📄 匯出 PDF</button>
+      <button onclick="exportPDF()" data-i18n="btnPDF" data-i18n-split>🖨️ 匯出 PDF</button>
       <button onclick="exportExcel()" data-i18n="btnExcel" data-i18n-split>📊 匯出 Excel</button>
       <button class="ghost-danger" onclick="closeOverview()" data-i18n="btnClose" data-i18n-split>✕ 關閉</button>
     </div>
@@ -1226,7 +1226,7 @@ function saveAppSettings(){ try { localStorage.setItem(APP_KEY, JSON.stringify(a
 var I18N = {
   "zh-Hant": {
     brand: "🧭 行程規劃工具",
-    btnSettings: "⚙️ 設定", btnSave: "💾 儲存行程", btnSaveAs: "📁 另存新檔", btnPDF: "📄 匯出 PDF", btnExcel: "📊 匯出 Excel", btnHome: "🏠 回首頁",
+    btnSettings: "⚙️ 設定", btnSave: "💾 儲存行程", btnSaveAs: "📁 另存新檔", btnPDF: "🖨️ 匯出 PDF", btnExcel: "📊 匯出 Excel", btnHome: "🏠 回首頁",
     homeTitle: "行程規劃", btnNew: "新建行程", btnLoad: "讀取行程", btnResume: "繼續上次行程", btnTripPlan: "行程建議", btnJpPreview: "日本景點參考", jpTitle: "日本景點參考",
     tripPlanTitle: "🗺️ 行程建議", tripPlanHint: "選擇目的地與天數,立即產生經典行程範本。範本僅安排景點,餐食與住宿請自行新增;產生後所有內容皆可再編輯。",
     tplDayBtn: "{n} 日", tplSpots: "{c} 個景點", tplAreaLbl: "涵蓋",
@@ -1301,7 +1301,7 @@ var I18N = {
   },
   "ja": {
     brand: "🧭 旅程プランナー",
-    btnSettings: "⚙️ 設定", btnSave: "💾 保存", btnSaveAs: "📁 名前を付けて保存", btnPDF: "📄 PDF 出力", btnExcel: "📊 Excel 出力", btnHome: "🏠 ホーム",
+    btnSettings: "⚙️ 設定", btnSave: "💾 保存", btnSaveAs: "📁 名前を付けて保存", btnPDF: "🖨️ PDF 出力", btnExcel: "📊 Excel 出力", btnHome: "🏠 ホーム",
     homeTitle: "旅程プランニング", btnNew: "新規作成", btnLoad: "読み込み", btnResume: "前回の続き", btnTripPlan: "旅程のおすすめ", btnJpPreview: "日本の名所", jpTitle: "日本の名所（参考）",
     tripPlanTitle: "🗺️ 旅程のおすすめ", tripPlanHint: "行き先と日数を選ぶと、定番の旅程テンプレートをすぐに作成します。テンプレートは観光スポットのみで、食事と宿泊は含みません。作成後はすべて編集できます。",
     tplDayBtn: "{n} 日間", tplSpots: "スポット {c} か所", tplAreaLbl: "エリア",
@@ -1376,7 +1376,7 @@ var I18N = {
   },
   "en": {
     brand: "🧭 Itinerary Planner",
-    btnSettings: "⚙️ Settings", btnSave: "💾 Save", btnSaveAs: "📁 Save As", btnPDF: "📄 Export PDF", btnExcel: "📊 Export Excel", btnHome: "🏠 Home",
+    btnSettings: "⚙️ Settings", btnSave: "💾 Save", btnSaveAs: "📁 Save As", btnPDF: "🖨️ Export PDF", btnExcel: "📊 Export Excel", btnHome: "🏠 Home",
     homeTitle: "Itinerary Planner", btnNew: "New Itinerary", btnLoad: "Load", btnResume: "Resume Last", btnTripPlan: "Suggested Plans", btnJpPreview: "Japan Spots", jpTitle: "Japan Spots (reference)",
     tripPlanTitle: "🗺️ Suggested Plans", tripPlanHint: "Pick a destination and length to generate a classic itinerary template. Templates cover sightseeing only — add meals and hotels yourself. Everything stays editable afterwards.",
     tplDayBtn: "{n} days", tplSpots: "{c} spots", tplAreaLbl: "Covers",
