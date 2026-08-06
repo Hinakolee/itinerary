@@ -802,8 +802,9 @@
     .ptab-label { writing-mode: horizontal-tb; text-orientation: mixed;
                   letter-spacing: normal; font-size: 13px; line-height: 1.2; text-align: center; }
 
-    /* 標題列:「行程/花費 逐日‧一頁」切換鈕縮成正方形圖示,與標題同一列靠右,
-       不再各佔一行(方形尺寸由上面的 button[data-i18n-split] 規則提供)。
+    /* 標題列:「行程/花費 逐日‧一頁」切換鈕與標題同一列靠右,不另佔一行。
+       這顆保留文字(不套 data-i18n-split),與下方「新增清單」等按鈕的樣式一致;
+       標題輸入框拿到剩餘寬度,過長時由輸入框自己橫向捲動。
        .itin-head 的第一層 div 必須有 min-width:0,否則 24px 字級 input 的固有寬度
        會把整列撐到 601px(視窗僅 376px)→ 產生全頁水平捲動。 */
     .itin-head { gap: 8px; align-items: center; }
@@ -1000,7 +1001,7 @@
             </div>
             <p class="editor-meta" id="edMeta"></p>
           </div>
-          <button id="itinModeBtn" data-i18n-split onclick="toggleItinMode()" data-i18n-title="tipItinMode" title="切換行程顯示方式">🗂️ 行程逐日顯示</button>
+          <button id="itinModeBtn" onclick="toggleItinMode()" data-i18n-title="tipItinMode" title="切換行程顯示方式">🗂️ 行程逐日顯示</button>
         </div>
         <div id="itinSubTabBar" class="subtab-bar no-print hidden"></div>
         <div id="daysContainer"></div>
@@ -1018,7 +1019,7 @@
           <div>
             <h1 class="editor-title" data-i18n="expenseTitle">💰 花費總覽</h1>
           </div>
-          <button id="expenseModeBtn" data-i18n-split onclick="toggleExpenseMode()" data-i18n-title="tipExpMode" title="切換花費顯示方式">🗂️ 花費逐日顯示</button>
+          <button id="expenseModeBtn" onclick="toggleExpenseMode()" data-i18n-title="tipExpMode" title="切換花費顯示方式">🗂️ 花費逐日顯示</button>
         </div>
         <div id="expenseSubTabBar" class="subtab-bar no-print hidden"></div>
         <div id="expenseBody"></div>
@@ -2417,7 +2418,7 @@ function updateItinModeBtn(){
   var b = $("itinModeBtn");
   if (!b){ return; }
   // 顯示「將切換到的動作」
-  setSplitLabel(b, (state && state.itinMode === "byday") ? t("itinModeToSingle") : t("itinModeToByday"));
+  b.textContent = (state && state.itinMode === "byday") ? t("itinModeToSingle") : t("itinModeToByday");
 }
 function toggleItinMode(){
   if (!state){ return; }
@@ -2443,7 +2444,7 @@ function updateExpenseModeBtn(){
   var b = $("expenseModeBtn");
   if (!b){ return; }
   // 顯示「將切換到的動作」
-  setSplitLabel(b, (state && state.expenseMode === "byday") ? t("expModeToSingle") : t("expModeToByday"));
+  b.textContent = (state && state.expenseMode === "byday") ? t("expModeToSingle") : t("expModeToByday");
 }
 function toggleExpenseMode(){
   if (!state){ return; }
